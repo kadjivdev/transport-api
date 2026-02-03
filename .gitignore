@@ -23,5 +23,10 @@ Homestead.json
 Homestead.yaml
 Thumbs.db
 /storage/logs/laravel.log
-/public/contrats/*.key
-/public/preuves/*.key
+
+/public/contrats/*
+!/public/contrats/.gitkeep
+
+/public/preuves/*
+!/public/preuves/.gitkeep
+
