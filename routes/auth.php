@@ -20,15 +20,5 @@ Route::post('/forgot-password', [PasswordResetLinkController::class, 'store'])
 Route::post('/reset-password', [NewPasswordController::class, 'store'])
     ->name('password.store');
 
-Route::middleware(["jwt.from.cookie"])->group(function () {
-    // Logout route
-    Route::post('/logout', [AuthenticatedSessionController::class, 'logout']) // old destroy
-        ->name('logout');
-});
-
-// Refresh route
-Route::post('/refresh', [AuthenticatedSessionController::class, 'refresh']) 
-    ->name('refresh');
-
 Route::post('/verify-token', [AuthenticatedSessionController::class, 'verifyAccessToken']) 
     ->name('verifyToken');

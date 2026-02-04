@@ -24,7 +24,8 @@ return [
     | since RSA and ECDSA use a private/public key combo (See below).
     |
     */
-
+    'cookie' => 'access_token',
+    
     'secret' => env('JWT_SECRET'),
 
     /*

@@ -12,17 +12,23 @@ return Application::configure(basePath: dirname(__DIR__))
         health: '/up',
     )
     ->withMiddleware(function (Middleware $middleware): void {
-        $middleware->api(prepend: [
-            \Laravel\Sanctum\Http\Middleware\EnsureFrontendRequestsAreStateful::class,
+
+        // ✅ REQUIRED: do NOT encrypt JWT cookies
+        $middleware->encryptCookies(except: [
+            'access_token',
+            'refresh_token',
         ]);
 
-        $middleware->alias([
-            'verified' => \App\Http\Middleware\EnsureEmailIsVerified::class,
+        // ❌ DO NOT use Sanctum with JWT
+        // $middleware->api(prepend: [
+        //     \Laravel\Sanctum\Http\Middleware\EnsureFrontendRequestsAreStateful::class,
+        // ]);
 
-            // custom middleware
-            'jwt.from.cookie' => \App\Http\Middleware\JwtFromAccessCookie::class,
+        $middleware->alias([
+            'jwt.from.cookie' => \App\Http\Middleware\JwtAccessCookie::class,
         ]);
     })
     ->withExceptions(function (Exceptions $exceptions): void {
         //
-    })->create();
+    })
+    ->create();
