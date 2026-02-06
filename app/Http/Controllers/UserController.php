@@ -13,7 +13,7 @@ class UserController extends Controller
 {
     function __construct()
     {
-        Log::debug("Les cookies actuels : ", ["data" => request()->cookie("access_token")]);
+        // Log::debug("Les cookies actuels : ", ["data" => request()->cookie("access_token")]);
     }
 
     /**
@@ -21,9 +21,9 @@ class UserController extends Controller
      */
     public function index()
     {
-        Log::info("Les cookies : ", ["cookies" => request()->cookies->all()]);
-        Log::info("Le header autorization : ", ["autorization" => request()->header('authorization')]);
-        Log::info("JWT_SECURE", ["data" => env("JWT_SECURE")]);
+        // Log::info("Les cookies : ", ["cookies" => request()->cookies->all()]);
+        // Log::info("Le header autorization : ", ["autorization" => request()->header('authorization')]);
+        // Log::info("JWT_SECURE", ["data" => env("JWT_SECURE")]);
 
         Log::info("Chargement de tous les utilisateurs");
         $users = User::latest()->get();
@@ -41,6 +41,8 @@ class UserController extends Controller
     public function store(UserRequest $request)
     {
         try {
+            Log::debug("Creating new user...", ["data" => $request->validated()]);
+
             DB::beginTransaction();
             User::create($request->validated());
 
@@ -50,7 +52,7 @@ class UserController extends Controller
         } catch (ValidationException $e) {
             Log::debug("Erreure de validation", ["errors" => $e->errors()]);
             DB::rollBack();
-            return response()->json(["errors" => $e->errors()]);
+            return response()->json(["errors" => $e->errors()], 422);
         } catch (\Exception $e) {
             Log::debug("Une erreure est survenue lors de l'insersion d'utilisateur", ["error" => $e->getMessage()]);
             DB::rollBack();
@@ -63,8 +65,8 @@ class UserController extends Controller
      */
     public function show(User $user)
     {
-        Log::debug("The user called!", ["data" => $user]);
-        return response()->json($user);
+        Log::debug("The user called!", ["data" => $user->load("roles")]);
+        return response()->json($user->load("roles"));
     }
 
     /**
@@ -82,6 +84,10 @@ class UserController extends Controller
             DB::commit();
             Log::info("Utilisateur modifié.e avec succès");
             return response()->json(["message" => "Utilisateur modifié.e avec succès", "data" => $user]);
+        } catch (ValidationException $e) {
+            Log::debug("Erreure de validation", ["errors" => $e->errors()]);
+            DB::rollBack();
+            return response()->json(["errors" => $e->errors()], 422);
         } catch (\Exception $e) {
             Log::debug("Une erreure est survenue lors de la modification d'utilisateur", ["error" => $e->getMessage()]);
             DB::rollBack();

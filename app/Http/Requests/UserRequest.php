@@ -25,16 +25,15 @@ class UserRequest extends FormRequest
         $userId = $this->route('user'); // ou auth()->id() selon ton cas
 
         return [
-            "name" => "sometimes|required|string|max:255",
-            // "email" => "sometimes|required|email|max:255|unique:users,email",
+            "name" => "required|string|max:255",
             'email' => [
-                'sometimes',
+                'required',
                 'required',
                 'email',
                 'max:255',
                 Rule::unique('users', 'email')->ignore($userId),
             ],
-            "password" => "sometimes|required|string|min:8|confirmed", // "confirmed" pour password_confirmation
+            "password" => "required|required|string|min:8|confirmed", // "confirmed" pour password_confirmation
         ];
     }
 

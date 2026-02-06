@@ -6,6 +6,7 @@ use App\Models\Role;
 use App\Models\User;
 use Exception;
 use Illuminate\Http\Request;
+use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 use Spatie\Permission\Models\Permission;
@@ -166,6 +167,8 @@ class RoleController extends Controller
      */
     public function affectRole(Request $request)
     {
+        Log::debug("Affectation de role :", ["data" => $request->all()]);
+
         try {
             $validated = $request->validate([
                 'user_id' => 'required|integer|exists:users,id',
@@ -186,7 +189,7 @@ class RoleController extends Controller
             DB::beginTransaction();
 
             /**
-             *  On supprime tous les anciens liens et on garde seulement ceux envoyés
+             *  On supprime tous les anciens roles et on garde seulement ceux envoyés
              * */
             DB::table('model_has_roles')
                 ->where('model_id', $user->id)
@@ -199,14 +202,16 @@ class RoleController extends Controller
             $user->assignRole($role->name);
 
             DB::commit();
-            return response()->json(["message" => "Rôle affecté avec succès!"]);
+            Log::info("Rôle affecté avec succès!");
+            $user['createdAt'] = Carbon::parse($user->created_at)->locale("fr")->isoFormat("D MMMM YYYY");
+            return response()->json(["message" => "Rôle affecté avec succès!","role" => $role, "user" => $user]);
         } catch (\Illuminate\Validation\ValidationException $e) {
             DB::rollBack();
             Log::debug("Erreure de validation", ["errors" => $e->errors()]);
-            return response()->json($e->errors(), 422);
+            return response()->json(["errors" => $e->errors()], 422);
         } catch (Exception $e) {
             DB::rollBack();
-            Log::debug("Erreure de d'exception", ["exception" => $e->getMessage()]);
+            Log::debug("Erreure de d'exception", ["error" => $e->getMessage()]);
             return response()->json(["error" => $e->getMessage()], 500);
         }
     }

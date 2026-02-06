@@ -18,11 +18,12 @@ Route::prefix("/v1")->group(function () {
     Route::post('/refresh', [AuthenticatedSessionController::class, 'refresh'])
         ->name('refresh');
 
+    // Logout route
+    Route::post('/logout', [AuthenticatedSessionController::class, 'logout']) // old destroy
+        ->name('logout');
+
     // Protected routes
     Route::middleware(['jwt.from.cookie'])->group(function () {
-        // Logout route
-        Route::post('/logout', [AuthenticatedSessionController::class, 'logout']) // old destroy
-            ->name('logout');
 
         Route::get("/permissions", [RoleController::class, "getPermissions"])->name("permissions");
         Route::post("/affect-role", [RoleController::class, "affectRole"])->name("affect-role");

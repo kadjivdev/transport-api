@@ -5,15 +5,18 @@ namespace App\Http\Controllers\Auth;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Auth\LoginRequest;
 use App\Models\RefreshToken;
+use App\Models\Role;
 use Exception;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Cookie;
-use Illuminate\Support\Facades\DB;
+// use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Str;
 use Illuminate\Validation\ValidationException;
+use Spatie\Permission\Models\Permission;
+use Spatie\Permission\Models\Role as ModelsRole;
 use Tymon\JWTAuth\Exceptions\JWTException;
 use Tymon\JWTAuth\Facades\JWTAuth;
 
@@ -25,9 +28,7 @@ class AuthenticatedSessionController extends Controller
     public function store(LoginRequest $request): Response
     {
         $request->authenticate();
-
         $request->session()->regenerate();
-
         return response()->noContent();
     }
 
@@ -63,6 +64,8 @@ class AuthenticatedSessionController extends Controller
 
             $user = Auth::guard('api')->user();
             $user['permissions'] = $user->getAllPermissions();
+            $all_permissions = Permission::get(["id", "name", "description"]);
+            $all_roles = Role::latest()->get(["id", "name"]);
 
             // Créer refresh token
             $refreshToken = RefreshToken::create([
@@ -103,7 +106,12 @@ class AuthenticatedSessionController extends Controller
 
             Log::info("Connexion réussie avec succès!");
             Log::info("Les cookies : ", ["cookies" => request()->cookies->all()]);
-            return response()->json(["message" => "Connexion réussie avec succès!", "user" => $user])
+            return response()->json([
+                "message" => "Connexion réussie avec succès!",
+                "user" => $user,
+                "all_permissions" => $all_permissions,
+                "all_roles" => $all_roles,
+            ])
                 ->withCookie($access_cookie)
                 ->withCookie($refresh_token);
         } catch (ValidationException $e) {
@@ -130,8 +138,6 @@ class AuthenticatedSessionController extends Controller
                 return response()->json(['error' => 'No access token'], 401);
             }
 
-            // JWTAuth::setToken($accessToken)->authenticate();
-
             $user = JWTAuth::setToken($accessToken)->getPayload($accessToken)->toArray();
 
             return response()->json([
@@ -154,13 +160,12 @@ class AuthenticatedSessionController extends Controller
     {
         try {
             //code...
-            Log::info("Vérification du token refresh ...");
+            Log::info("Refreshing du token refresh ...");
             $refreshTokenValue = $request->cookie('refresh_token');
 
             Log::debug("The refresh token ", ["token" => $refreshTokenValue]);
             Log::info("Les cookies : ", ["cookies" => request()->cookies->all()]);
             Log::info("Le header autorization : ", ["autorization" => request()->header('authorization')]);
-
 
             if (!$refreshTokenValue) {
                 return response()->json(['error' => 'No refresh token'], 401);
@@ -187,11 +192,11 @@ class AuthenticatedSessionController extends Controller
                 $accessToken,
                 (int) env("JWT_TTL"),
                 '/',
-                null,
-                true, //$secure,          // secure
-                true,          // httpOnly
-                false,         // raw
-                'None', //$sameSite       // sameSite
+                null,                           // domain
+                false,                          // $secure,          // secure
+                true,                           // httpOnly
+                false,                          // raw
+                'Lax',
             );
 
             return response()->json(['message' => 'Token refreshed'])
