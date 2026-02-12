@@ -19,5 +19,8 @@ class AllPermissionToSuperAdminSeeder extends Seeder
         // Assigner le rôle de super administrateur à l'utilisateur avec l'ID 1
         $user = User::find(1);
         $user->syncPermissions($allPermissions);
+
+        $superAdmin = Role::find(1);
+        $superAdmin->syncPermissions($allPermissions);
     }
 }

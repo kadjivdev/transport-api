@@ -21,10 +21,6 @@ class UserController extends Controller
      */
     public function index()
     {
-        // Log::info("Les cookies : ", ["cookies" => request()->cookies->all()]);
-        // Log::info("Le header autorization : ", ["autorization" => request()->header('authorization')]);
-        // Log::info("JWT_SECURE", ["data" => env("JWT_SECURE")]);
-
         Log::info("Chargement de tous les utilisateurs");
         $users = User::latest()->get();
 

@@ -65,7 +65,8 @@ class AuthenticatedSessionController extends Controller
             $user = Auth::guard('api')->user();
             $user['permissions'] = $user->getAllPermissions();
             $all_permissions = Permission::get(["id", "name", "description"]);
-            $all_roles = Role::latest()->get(["id", "name"]);
+            $all_roles = Role::with("permissions")
+                ->latest()->get();
 
             // Créer refresh token
             $refreshToken = RefreshToken::create([
