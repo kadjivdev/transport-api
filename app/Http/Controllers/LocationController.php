@@ -24,7 +24,7 @@ class LocationController extends Controller
 
         $data = LocationResource::collection($locations);
         if ($locations->isEmpty()) {
-            return response()->json($data, 404);
+            return response()->json($data, 204);
         }
         return response()->json($data, 200);
     }

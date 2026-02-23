@@ -73,6 +73,7 @@ class UserController extends Controller
         Log::info("Updating user ...", ["user" => $user]);
         try {
             DB::beginTransaction();
+            
             $user->update($request->validated());
 
             $user->refresh();

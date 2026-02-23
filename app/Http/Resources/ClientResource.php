@@ -2,6 +2,7 @@
 
 namespace App\Http\Resources;
 
+use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\JsonResource;
 
@@ -22,7 +23,7 @@ class ClientResource extends JsonResource
             "prenom" => $this->prenom,
             "phone" => $this->phone,
             "ifu" => $this->ifu,
-            "createdAt" => $this->created_at
+            "createdAt" => Carbon::parse($this->created_at)->locale("fr")->isoFormat("D MMMM YYYY")
         ];
     }
 }

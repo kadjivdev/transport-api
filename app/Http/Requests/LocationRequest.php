@@ -25,7 +25,7 @@ class LocationRequest extends FormRequest
         return [
             'client_id'           => 'required|integer|exists:clients,id',
             'location_type_id'    => 'required|integer|exists:location_types,id',
-            'type_location_price' => 'required',
+            // 'type_location_price' => 'required',
             'montant_total'       => 'nullable',
             'date_location'       => 'required|date',
             'contrat'             => 'required|file|mimes:pdf,doc,docx|max:5120', // max en Ko (5 Mo)
@@ -61,8 +61,8 @@ class LocationRequest extends FormRequest
             'location_type_id.exists'   => 'Le type de location sélectionné est introuvable.',
 
             // type_location_price
-            'type_location_price.required' => 'Le prix du type de location est obligatoire.',
-            'type_location_price.decimal'  => 'Le prix du type de location doit être un nombre décimal valide.',
+            // 'type_location_price.required' => 'Le prix du type de location est obligatoire.',
+            // 'type_location_price.decimal'  => 'Le prix du type de location doit être un nombre décimal valide.',
 
             // montant_total
             // 'montant_total.required' => 'Le montant total est obligatoire.',

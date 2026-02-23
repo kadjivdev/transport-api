@@ -3,7 +3,6 @@
 namespace Database\Seeders;
 
 use App\Models\LocationType;
-use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Seeder;
 
 class LocationTypeSeeder extends Seeder
@@ -15,9 +14,9 @@ class LocationTypeSeeder extends Seeder
     {
         //
         LocationType::insert([
-            ["libelle" => "Par voyage", "description" => "Location par voyage"],
-            ["libelle" => "Journalière", "description" => "Location par jour"],
-            ["libelle" => "Par tonnage", "description" => "Location par tonnage"],
+            ["libelle" => "Par voyage", "description" => "Location par voyage", "price" => 0],
+            ["libelle" => "Journalière", "description" => "Location par jour", "price" => 0],
+            ["libelle" => "Par tonnage", "description" => "Location par tonnage", "price" => 0],
         ]);
     }
 }

@@ -23,14 +23,13 @@ class ClientRequest extends FormRequest
     public function rules(): array
     {
         return [
-            "nom" => "sometimes|required|string",
-            "prenom" => "sometimes|required|string",
+            "nom" => "required|string",
+            "prenom" => "required|string",
             "phone" => [
-                "sometimes",
                 "required",
                 Rule::unique('clients', 'phone')->ignore($this->route("client")),
             ],
-            "ifu" => ["sometimes", "required", Rule::unique('clients', 'phone')->ignore($this->route("client"))],
+            "ifu" => ["required", Rule::unique('clients', 'phone')->ignore($this->route("client"))],
         ];
     }
 

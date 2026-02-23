@@ -21,9 +21,9 @@ class ClientController extends Controller
 
         $data = ClientResource::collection($clients);
         if ($clients->isEmpty()) {
-            return response()->json($data, 404);
+            return response()->json($data, 204);
         }
-        return response()->json($data, 200);
+        return response()->json($data);
     }
 
     /**
@@ -37,7 +37,7 @@ class ClientController extends Controller
 
             DB::commit();
             Log::info("Client crée avec succès");
-            return response()->json(["message" => "Client.e crée.e avec succès"]);
+            return response()->json(["message" => "Client.e crée.e avec succès"],201);
         } catch (ValidationException $e) {
             Log::debug("Erreure de validation", ["errors" => $e->errors()]);
             DB::rollBack();

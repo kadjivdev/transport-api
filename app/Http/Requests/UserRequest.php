@@ -33,7 +33,13 @@ class UserRequest extends FormRequest
                 'max:255',
                 Rule::unique('users', 'email')->ignore($userId),
             ],
-            "password" => "required|required|string|min:8|confirmed", // "confirmed" pour password_confirmation
+            
+            "password" =>[
+                $userId ? "nullable" : "required",
+                "string",
+                "min:8",
+            ]
+            // "required|required|string|min:8|confirmed", // "confirmed" pour password_confirmation
         ];
     }
 

@@ -24,9 +24,10 @@ class LocationTypeController extends Controller
      */
     public function store(Request $request)
     {
+        Log::info("Début de création d'un type de location");
         try {
             DB::beginTransaction();
-            LocationType::create($request->only("libelle", "description"));
+            LocationType::create($request->only("libelle", "description",'price'));
 
             DB::commit();
             Log::info("Type crée avec succès");

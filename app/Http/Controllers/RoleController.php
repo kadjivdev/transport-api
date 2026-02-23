@@ -60,7 +60,7 @@ class RoleController extends Controller
             // store
             $role = Role::create([
                 'name' => $request->name,
-                'guard_name' => 'web'
+                'guard_name' => 'api'
             ]);
 
             /**
@@ -74,6 +74,7 @@ class RoleController extends Controller
             $role->syncPermissions($permissions->pluck("name"));
 
             DB::commit();
+            Log::info("Role crée avec succès!");
             return response()->json(["message" => "Rôle crée avec succès!"], 201);
         } catch (\Illuminate\Validation\ValidationException $e) {
             Log::debug("Erreure de validation", ["errors" => $e->errors()]);
@@ -204,7 +205,7 @@ class RoleController extends Controller
             DB::commit();
             Log::info("Rôle affecté avec succès!");
             $user['createdAt'] = Carbon::parse($user->created_at)->locale("fr")->isoFormat("D MMMM YYYY");
-            return response()->json(["message" => "Rôle affecté avec succès!","role" => $role, "user" => $user]);
+            return response()->json(["message" => "Rôle affecté avec succès!", "role" => $role, "user" => $user]);
         } catch (\Illuminate\Validation\ValidationException $e) {
             DB::rollBack();
             Log::debug("Erreure de validation", ["errors" => $e->errors()]);

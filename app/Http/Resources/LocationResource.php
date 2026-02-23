@@ -2,6 +2,7 @@
 
 namespace App\Http\Resources;
 
+use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\JsonResource;
 
@@ -25,13 +26,13 @@ class LocationResource extends JsonResource
 
             // relations
             "client" => $this->client,
+            "date_location" => $this->date_location?Carbon::parse($this->date_location)->locale("fr")->isoFormat("D MMMM YYYY"):null,
             "type" => $this->type,
             "details" => $this->details->load("camion"),
-            "createdAt" => $this->created_at,
+            "createdAt" => Carbon::parse($this->created_at)->locale("fr")->isoFormat("D MMMM YYYY"),
             "createdBy" => $this->createdBy,
             "validatedBy" => $this->validatedBy,
-            "validatedAt" => $this->validated_at,
-            "createdAt" => $this->created_at
+            "validatedAt" => $this->validated_at?Carbon::parse($this->validated_at)->locale("fr")->isoFormat("D MMMM YYYY"):null,
         ];
     }
 }
