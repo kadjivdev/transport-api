@@ -23,7 +23,7 @@ class ReglementLocationController extends Controller
 
         $data = ReglementResource::collection($reglements);
         if ($reglements->isEmpty()) {
-            return response()->json($data, 404);
+            return response()->json($data, 204);
         }
         return response()->json($data, 200);
     }
@@ -78,6 +78,11 @@ class ReglementLocationController extends Controller
 
             $reglement->refresh();
 
+            // verification du reste à regler sur la location
+            if ($reglement->montant > $reglement->location?->reste_a_regler) {
+                throw new \Exception("Le montant maximum restant à régler sur cette location est de {{$reglement->location?->reste_a_regler}}");
+            }
+            
             DB::commit();
             Log::info("Reglement modifié avec succès");
             return response()->json(["message" => "reglement modifiee avec succès", "data" => $reglement]);
@@ -116,6 +121,11 @@ class ReglementLocationController extends Controller
     {
         try {
             DB::beginTransaction();
+
+            // verification du reste à regler sur la location
+            if ($reglement->montant > $reglement->location?->reste_a_regler) {
+                throw new \Exception("Le montant maximum restant à régler sur cette location est de {{$reglement->location?->reste_a_regler}}");
+            }
 
             $reglement->update([
                 "validated_at" => now(),

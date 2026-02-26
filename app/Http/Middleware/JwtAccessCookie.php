@@ -25,7 +25,7 @@ class JwtAccessCookie
         try {
             $token = $request->cookie('access_token');
 
-            Log::debug("JWT cokie called ....", ["cookie" => $token]);
+            // Log::debug("JWT cokie called ....", ["cookie" => $token]);
 
             $user = JWTAuth::setToken($token)->authenticate();
 

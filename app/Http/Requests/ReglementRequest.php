@@ -25,7 +25,7 @@ class ReglementRequest extends FormRequest
         return [
             'location_id'    => 'sometimes|required|integer|exists:locations,id',
             'montant'       => 'sometimes|required|numeric',
-            'preuve'             => 'nullable|file|mimes:pdf,doc,docx|max:5120', // max en Ko (5 Mo)
+            'preuve'             => 'nullable|file|mimes:pdf,png,jpg,jpeg,doc,docx|max:5120', // max en Ko (5 Mo)
             "commentaire"         => "nullable",
             "reference"           => ["nullable", Rule::unique("reglement_locations", "reference")->ignore($this->route("reglement"))],
         ];
@@ -49,7 +49,7 @@ class ReglementRequest extends FormRequest
             // preuve
             'preuve.required'      => 'La preuve est obligatoire.',
             'preuve.file'          => 'La preuve doit être un fichier.',
-            'preuve.mimes'         => 'La preuve doit être un fichier de type : pdf, doc ou docx.',
+            'preuve.mimes'         => 'La preuve doit être un fichier de type : pdf,png,jpg,jpeg, doc ou docx.',
             'preuve.max'           => 'La preuve ne doit pas dépasser 5 Mo.',
 
             // reference

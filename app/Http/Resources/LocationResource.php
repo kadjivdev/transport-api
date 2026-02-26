@@ -20,19 +20,23 @@ class LocationResource extends JsonResource
         return [
             "id" => $this->id,
             "reference" => $this->reference,
-            "montant_total" => $this->montant_total,
+            "montant" => number_format($this->total_amount, 2, ",", ''),
+            "regle" => number_format($this->reglements()->whereNotNull("validated_at")->sum("montant"), 2, ",", ''),
+            "reste" => number_format($this->reste_a_regler, 2, ",", ''),
+            "_reste" => $this->reste_a_regler,
             "contrat" => $this->contrat,
             "commentaire" => $this->commentaire,
 
             // relations
             "client" => $this->client,
-            "date_location" => $this->date_location?Carbon::parse($this->date_location)->locale("fr")->isoFormat("D MMMM YYYY"):null,
+            "date" => $this->date_location,
+            "date_location" => $this->date_location ? Carbon::parse($this->date_location)->locale("fr")->isoFormat("D MMMM YYYY") : null,
             "type" => $this->type,
             "details" => $this->details->load("camion"),
             "createdAt" => Carbon::parse($this->created_at)->locale("fr")->isoFormat("D MMMM YYYY"),
             "createdBy" => $this->createdBy,
             "validatedBy" => $this->validatedBy,
-            "validatedAt" => $this->validated_at?Carbon::parse($this->validated_at)->locale("fr")->isoFormat("D MMMM YYYY"):null,
+            "validatedAt" => $this->validated_at ? Carbon::parse($this->validated_at)->locale("fr")->isoFormat("D MMMM YYYY") : null,
         ];
     }
 }

@@ -60,7 +60,7 @@ class ReglementLocation extends Model
         if (request()->hasFile("preuve")) {
             $file = request()->file("preuve");
             $name = time() . "_" . $file->getClientOriginalName();
-            $file->move("/preuves", $name);
+            $file->move("preuves", $name);
             $fileUrl = asset("/preuves/" . $name);
         }
 

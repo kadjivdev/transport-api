@@ -14,6 +14,8 @@ class Location extends Model
 {
     use SoftDeletes;
 
+    protected $appends = ["total_amount", "reste_a_regler"];
+
     protected $fillable = [
         "reference",
         "client_id",
@@ -83,10 +85,26 @@ class Location extends Model
     }
 
     // handle total amount
-    function getTotalAmount()
+    function getTotalAmountAttribute()
     {
         Log::info("getTotalAmount is Called.....");
         return $this->details()->sum("price");
+    }
+
+    // les reglements
+    function reglements(): HasMany
+    {
+        return $this->hasMany(ReglementLocation::class, "location_id");
+    }
+
+    // reste à regler
+    function getResteAReglerAttribute()
+    {
+        return $this->total_amount -
+            // les reglements validés
+            $this->reglements()
+            ->whereNotNull("validated_at")
+            ->sum("montant");
     }
 
     // handle reference
