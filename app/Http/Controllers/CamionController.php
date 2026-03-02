@@ -21,7 +21,7 @@ class CamionController extends Controller
 
         $data = CamionResource::collection($Camions);
         if ($Camions->isEmpty()) {
-            return response()->json($data, 404);
+            return response()->json($data, 204);
         }
         return response()->json($data, 200);
     }

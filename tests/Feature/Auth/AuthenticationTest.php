@@ -1,9 +1,13 @@
 <?php
 
 use App\Models\User;
+use Illuminate\Support\Facades\Log;
 
 test('users can authenticate using the login screen', function () {
     $user = User::factory()->create();
+
+    Log::debug("Le user en question : ", ["data" => $user]);
+    Log::debug("Les users : ", ["data" => User::all()]);
 
     $response = $this->post('/login', [
         'email' => $user->email,

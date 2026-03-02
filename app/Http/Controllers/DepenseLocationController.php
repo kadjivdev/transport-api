@@ -22,7 +22,7 @@ class DepenseLocationController extends Controller
 
         $data = DepenseRousource::collection($depenses);
         if ($depenses->isEmpty()) {
-            return response()->json($data, 404);
+            return response()->json($data, 204);
         }
         return response()->json($data, 200);
     }
