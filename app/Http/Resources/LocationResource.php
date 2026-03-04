@@ -15,15 +15,14 @@ class LocationResource extends JsonResource
      */
     public function toArray(Request $request): array
     {
-        // return parent::toArray($request);
-
         return [
             "id" => $this->id,
             "reference" => $this->reference,
-            "montant" => number_format($this->total_amount, 2, ",", ''),
-            "regle" => number_format($this->reglements()->whereNotNull("validated_at")->sum("montant"), 2, ",", ''),
-            "reste" => number_format($this->reste_a_regler, 2, ",", ''),
+            "montant" => number_format($this->total_amount, 2, ",", ' '),
+            "regle" => number_format($this->regler, 2, ",", ' '),
+            "reste" => number_format($this->reste_a_regler, 2, ",", ' '),
             "_reste" => $this->reste_a_regler,
+            "depenseAmount" => number_format($this->depense_amount, 2, ",", " "),
             "contrat" => $this->contrat,
             "commentaire" => $this->commentaire,
 

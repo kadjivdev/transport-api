@@ -47,7 +47,6 @@ class ReglementRequest extends FormRequest
             'montant.numeric'      => 'Le montant doit être un nombre valide.',
 
             // preuve
-            'preuve.required'      => 'La preuve est obligatoire.',
             'preuve.file'          => 'La preuve doit être un fichier.',
             'preuve.mimes'         => 'La preuve doit être un fichier de type : pdf,png,jpg,jpeg, doc ou docx.',
             'preuve.max'           => 'La preuve ne doit pas dépasser 5 Mo.',

@@ -14,7 +14,7 @@ class Location extends Model
 {
     use SoftDeletes;
 
-    protected $appends = ["total_amount", "reste_a_regler"];
+    protected $appends = ["total_amount", "reste_a_regler", "depense_amount","regler"];
 
     protected $fillable = [
         "reference",
@@ -59,6 +59,18 @@ class Location extends Model
         return $this->hasMany(LocationDetail::class, "location_id");
     }
 
+    function depenses(): HasMany
+    {
+        return $this->hasMany(DepenseLocation::class, "location_id");
+    }
+
+    function getDepenseAmountAttribute()
+    {
+        return $this->depenses()
+            ->whereNotNull("validated_at")
+            ->sum("montant");
+    }
+
     function createdBy(): BelongsTo
     {
         return $this->belongsTo(User::class, "created_by");
@@ -95,6 +107,15 @@ class Location extends Model
     function reglements(): HasMany
     {
         return $this->hasMany(ReglementLocation::class, "location_id");
+    }
+
+    // reste reglé
+    function getReglerAttribute()
+    {
+        return
+            $this->reglements()
+            ->whereNotNull("validated_at")
+            ->sum("montant");
     }
 
     // reste à regler
@@ -136,7 +157,7 @@ class Location extends Model
         // created
         static::created(function ($model) {
             $model->reference = $model->generateReference();
-            $model->montant_total = $model->getTotalAmount();
+            // $model->montant_total = $model->getTotalAmount();
             $model->contrat = $model->getContratUrl();
             $model->saveQuietly(); // VERY IMPORTANT
         });

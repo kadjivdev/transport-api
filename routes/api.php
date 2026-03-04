@@ -32,7 +32,11 @@ Route::prefix("/v1")->group(function () {
         Route::apiResource("roles", RoleController::class)->except(["create", "edit"]);
         Route::apiResource("clients", ClientController::class)->except(["create", "edit"]);
         Route::apiResource("camions", CamionController::class)->except(["create", "edit"]);
+
+        // locations
         Route::apiResource("locations", LocationController::class)->except(["create", "edit"]);
+        Route::post("/locations/statistiques", [LocationController::class, "statistiques"])->name("statistiques");
+
         Route::apiResource("reglements", ReglementLocationController::class)->except(["create", "edit"]);
         Route::apiResource("depenses", DepenseLocationController::class)->except(["create", "edit"]);
         Route::apiResource("location-types", LocationTypeController::class)->except(["create", "edit"]);

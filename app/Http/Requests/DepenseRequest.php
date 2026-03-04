@@ -25,7 +25,7 @@ class DepenseRequest extends FormRequest
         return [
             'location_id'    => 'sometimes|required|integer|exists:locations,id',
             'montant'       => 'sometimes|required|numeric',
-            'preuve'             => 'nullable|file|mimes:pdf,doc,docx|max:5120', // max en Ko (5 Mo)
+            'preuve'             => 'nullable|file|mimes:pdf,png,jpg,jpeg,doc,docx|max:5120', // max en Ko (5 Mo)
             "commentaire"         => "nullable",
             "reference"           => ["nullable", Rule::unique("depense_locations", "reference")->ignore($this->route("depense"))],
         ];
@@ -47,7 +47,6 @@ class DepenseRequest extends FormRequest
             'montant.numeric'      => 'Le montant doit être un nombre valide.',
 
             // preuve
-            'preuve.required'      => 'La preuve est obligatoire.',
             'preuve.file'          => 'La preuve doit être un fichier.',
             'preuve.mimes'         => 'La preuve doit être un fichier de type : pdf, doc ou docx.',
             'preuve.max'           => 'La preuve ne doit pas dépasser 5 Mo.',
