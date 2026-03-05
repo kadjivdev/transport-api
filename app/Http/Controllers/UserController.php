@@ -70,7 +70,7 @@ class UserController extends Controller
      */
     public function update(UserRequest $request, User $user)
     {
-        Log::info("Updating user ...", ["user" => $user]);
+        Log::info("Updating user gogo ...", ["user" => $user]);
         try {
             DB::beginTransaction();
             

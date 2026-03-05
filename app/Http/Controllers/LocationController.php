@@ -37,6 +37,7 @@ class LocationController extends Controller
     {
         Log::info("Début d'insertion des locations", ["data" => $request->all()]);
         Log::info("The user connected", ["user" => Auth::user()]);
+
         try {
             DB::beginTransaction();
             $location = Location::create($request->validated());
@@ -77,21 +78,20 @@ class LocationController extends Controller
      */
     public function update(LocationRequest $request, Location $location)
     {
-        Log::info("Updating location ...", ["location" => $location, "data" => $request->all()]);
+        Log::info("Updating location ...", ["location" => $location->load("details"), "data" => $request->all()]);
         try {
             DB::beginTransaction();
 
             // suppressison des détails
             $location->details()->delete();
 
+            Log::debug("Validated request :", ["data" => $request->validated()]);
             // updating ....
             $location->update($request->validated());
 
             // details
-            if ($location->details->isNotEmpty()) {
-                $location->details()
-                    ->createMany($request->details);
-            }
+            $location->details()
+                ->createMany($request->details);
 
             $location->refresh();
 
@@ -156,9 +156,9 @@ class LocationController extends Controller
     public function statistiques(Request $request)
     {
         try {
-            $date = Carbon::parse($request->date ?? now())->toDateString();
-
             $dates = $request->input('dates', []);
+
+            Log::debug("Les requestes : ", ["requestes" => $request->all()]);
 
             $date = !empty($dates['date'])
                 ? Carbon::parse($dates['date'])->toDateString()
@@ -172,6 +172,16 @@ class LocationController extends Controller
                 ? Carbon::parse($dates['fin'])->toDateString()
                 : null;
 
+            // quand date existe, pas de filtre périodique
+            if (!empty($dates['date'])) {
+                $debut = $fin = null;
+            }
+
+            // quand la période existe, pas de filtre journalière
+            if ($debut || $fin) {
+                $date = null;
+            }
+
             Log::debug("La date du search...", ["date" => $date]);
 
             // query
@@ -179,7 +189,7 @@ class LocationController extends Controller
                 ->whereNotNull("validated_at");
 
             Log::debug("Les dates ", ['debut' => $debut, 'fin' => $fin]);
-            
+
             // filtre
             if ($debut && $fin) {
                 $query->whereDate("date_location", ">=", $debut)

@@ -3,6 +3,7 @@
 namespace App\Http\Requests;
 
 use Illuminate\Foundation\Http\FormRequest;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Validation\Rule;
 
 class LocationRequest extends FormRequest
@@ -22,6 +23,8 @@ class LocationRequest extends FormRequest
      */
     public  function rules(): array
     {
+        Log::debug("La requete en cours : ",["data"=>request()->all()]);
+        
         return [
             'client_id'           => 'required|integer|exists:clients,id',
             'location_type_id'    => 'required|integer|exists:location_types,id',

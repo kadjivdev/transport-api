@@ -14,7 +14,7 @@ class Location extends Model
 {
     use SoftDeletes;
 
-    protected $appends = ["total_amount", "reste_a_regler", "depense_amount","regler"];
+    protected $appends = ["total_amount", "reste_a_regler", "depense_amount", "regler"];
 
     protected $fillable = [
         "reference",
@@ -157,9 +157,14 @@ class Location extends Model
         // created
         static::created(function ($model) {
             $model->reference = $model->generateReference();
-            // $model->montant_total = $model->getTotalAmount();
             $model->contrat = $model->getContratUrl();
             $model->saveQuietly(); // VERY IMPORTANT
+        });
+
+        static::updating(function ($model) {
+            if (!request()->filled("contrat")) {
+                unset($model->contrat);
+            }
         });
 
         // updating

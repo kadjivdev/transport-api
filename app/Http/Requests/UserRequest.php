@@ -38,6 +38,7 @@ class UserRequest extends FormRequest
                 $userId ? "nullable" : "required",
                 "string",
                 "min:8",
+                "confirmed"
             ]
             // "required|required|string|min:8|confirmed", // "confirmed" pour password_confirmation
         ];

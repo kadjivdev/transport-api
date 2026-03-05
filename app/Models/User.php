@@ -66,13 +66,13 @@ class User extends Authenticatable implements JWTSubject
         parent::boot();
 
         static::updating(function ($model) {
-            if (!request()->filled("password")) {
-                Log::info("Password not precise");
+
+            if (!request()->filled('password')) {
+                Log::info("Password not provided");
                 Log::debug("User :", ["data" => $model]);
-                $model->password = $model->password;
-                $model->saveQuietly();
+                unset($model->password);
             } else {
-                Log::debug("Password :", ["data" => request()->get("password")]);
+                Log::debug("Password :", ["data" => request()->get('password')]);
             }
         });
     }
