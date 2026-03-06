@@ -3,6 +3,7 @@
 namespace App\Http\Requests;
 
 use Illuminate\Foundation\Http\FormRequest;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Validation\Rule;
 
 class ReglementRequest extends FormRequest
@@ -22,6 +23,8 @@ class ReglementRequest extends FormRequest
      */
     public function rules(): array
     {
+        Log::debug("The request reglement updating :",request()->all());
+        
         return [
             'location_id'    => 'sometimes|required|integer|exists:locations,id',
             'montant'       => 'sometimes|required|numeric',

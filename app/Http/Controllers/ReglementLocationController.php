@@ -74,15 +74,18 @@ class ReglementLocationController extends Controller
             DB::beginTransaction();
 
             // updating ....
+            // Log::debug("The reglement : ", ["data" => $reglement]);
+            Log::debug("Validated request : ", ["data" => $request->validated()]);
+
             $reglement->update($request->validated());
 
-            $reglement->refresh();
+            // $reglement->refresh();
 
             // verification du reste à regler sur la location
-            if ($reglement->montant > $reglement->location?->reste_a_regler) {
+            if ($request->montant > $reglement->location?->reste_a_regler) {
                 throw new \Exception("Le montant maximum restant à régler sur cette location est de {{$reglement->location?->reste_a_regler}}");
             }
-            
+
             DB::commit();
             Log::info("Reglement modifié avec succès");
             return response()->json(["message" => "reglement modifiee avec succès", "data" => $reglement]);

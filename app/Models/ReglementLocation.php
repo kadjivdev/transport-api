@@ -105,6 +105,8 @@ class ReglementLocation extends Model
             if (request()->hasFile("preuve")) {
                 $model->preuve = $model->getPreuveUrl();
                 $model->saveQuietly(); // VERY IMPORTANT
+            } else {
+                unset($model->preuve);
             }
         });
     }
