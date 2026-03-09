@@ -3,6 +3,7 @@
 use App\Http\Controllers\Auth\AuthenticatedSessionController;
 use App\Http\Controllers\CamionController;
 use App\Http\Controllers\ClientController;
+use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\DepenseLocationController;
 use App\Http\Controllers\LocationController;
 use App\Http\Controllers\LocationTypeController;
@@ -24,7 +25,7 @@ Route::prefix("/v1")->group(function () {
 
     // Protected routes
     Route::middleware(['jwt.from.cookie'])->group(function () {
-
+        Route::get("/dashboard", DashboardController::class)->name("dahsboard");
         Route::get("/permissions", [RoleController::class, "getPermissions"])->name("permissions");
         Route::post("/affect-role", [RoleController::class, "affectRole"])->name("affect-role");
 
@@ -35,7 +36,9 @@ Route::prefix("/v1")->group(function () {
 
         // locations
         Route::apiResource("locations", LocationController::class)->except(["create", "edit"]);
-        Route::post("/locations/statistiques", [LocationController::class, "statistiques"])->name("statistiques");
+        Route::post("/locations/statistiques-date", [LocationController::class, "statistiquesDate"])->name("statistiquesDate");
+        Route::match(["GET", "POST"], "/locations/statistiques-periode", [LocationController::class, "statistiquesPeriode"])->name("statistiquesPeriode");
+        Route::match(["GET", "POST"], "/locations/statistiques-client", [LocationController::class, "statistiquesClient"])->name("statistiquesClient");
 
         Route::apiResource("reglements", ReglementLocationController::class)->except(["create", "edit"]);
         Route::apiResource("depenses", DepenseLocationController::class)->except(["create", "edit"]);

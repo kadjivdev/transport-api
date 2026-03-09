@@ -40,11 +40,11 @@ class UserController extends Controller
             Log::debug("Creating new user...", ["data" => $request->validated()]);
 
             DB::beginTransaction();
-            User::create($request->validated());
+            $user = User::create($request->validated());
 
             DB::commit();
             Log::info("Utilisateur crée avec succès");
-            return response()->json(["message" => "Utilisateur crée avec succès"], 201);
+            return response()->json(["message" => "Utilisateur crée avec succès", "user" => $user], 201);
         } catch (ValidationException $e) {
             Log::debug("Erreure de validation", ["errors" => $e->errors()]);
             DB::rollBack();
@@ -70,10 +70,10 @@ class UserController extends Controller
      */
     public function update(UserRequest $request, User $user)
     {
-        Log::info("Updating user gogo ...", ["user" => $user]);
+        Log::info("Updating user ...", ["user" => $user]);
         try {
             DB::beginTransaction();
-            
+
             $user->update($request->validated());
 
             $user->refresh();
@@ -97,6 +97,7 @@ class UserController extends Controller
      */
     public function destroy(User $user)
     {
+        Log::debug("Suppression d'un utilisateur", ["data" => $user]);
         try {
             DB::beginTransaction();
             $user->delete();

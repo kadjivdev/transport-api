@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Http\Requests\LocationRequest;
 use App\Http\Resources\LocationResource;
+use App\Models\Client;
 use App\Models\Location;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\Auth;
@@ -151,59 +152,20 @@ class LocationController extends Controller
     }
 
     /**
-     * Display a listing of the statistiques.
+     * Statistique par date.
      */
-    public function statistiques(Request $request)
+    public function statistiquesDate(Request $request)
     {
         try {
-            $dates = $request->input('dates', []);
+            Log::debug("Les datas : ", ["datas" => $request->all()]);
 
-            Log::debug("Les requestes : ", ["requestes" => $request->all()]);
-
-            $date = !empty($dates['date'])
-                ? Carbon::parse($dates['date'])->toDateString()
-                : now();
-
-            $debut = !empty($dates['debut'])
-                ? Carbon::parse($dates['debut'])->toDateString()
-                : null;
-
-            $fin = !empty($dates['fin'])
-                ? Carbon::parse($dates['fin'])->toDateString()
-                : null;
-
-            // quand date existe, pas de filtre périodique
-            if (!empty($dates['date'])) {
-                $debut = $fin = null;
-            }
-
-            // quand la période existe, pas de filtre journalière
-            if ($debut || $fin) {
-                $date = null;
-            }
-
-            Log::debug("La date du search...", ["date" => $date]);
+            $date = Carbon::parse($request->date ?? now())->toDateString();
 
             // query
-            $query = Location::latest()
-                ->whereNotNull("validated_at");
-
-            Log::debug("Les dates ", ['debut' => $debut, 'fin' => $fin]);
-
-            // filtre
-            if ($debut && $fin) {
-                $query->whereDate("date_location", ">=", $debut)
-                    ->whereDate("date_location", "<=", $fin);
-            }
-
-            if ($date) {
-                $query->whereDate("date_location", $date);
-            }
-
-            $locations = $query->get();
-            if ($locations->isEmpty()) {
-                return response()->json([], 204);
-            }
+            $locations = Location::latest()
+                ->whereDate("date_location", $date)
+                ->whereNotNull("validated_at")
+                ->get();
 
             Log::debug("Locations filtrées :", ["data" => $locations]);
 
@@ -218,7 +180,99 @@ class LocationController extends Controller
 
             return response()->json([
                 "locations" => LocationResource::collection($locations),
-                "totaux" => $totaux
+                "totaux" => $totaux,
+                "client" => Client::firstWhere("id", $request->client_id),
+            ], 200);
+        } catch (\Illuminate\Validation\ValidationException $e) {
+            Log::debug("Erreur de validation lors de la statistique", [
+                "data" => $e->errors()
+            ]);
+
+            return response()->json($e->errors(), 422);
+        }
+    }
+
+    /**
+     * Statistique par période.
+     */
+    public function statistiquesPeriode(Request $request)
+    {
+        try {
+            Log::debug("Les datas : ", ["datas" => $request->all()]);
+
+            $debut = $request->debut ? Carbon::parse($request->debut)->toDateString() : null;
+            $fin = $request->fin ? Carbon::parse($request->fin)->toDateString() : null;
+
+            if (!$debut && !$fin) {
+                return response()
+                    ->json([]);
+            }
+            // query
+            $locations = Location::latest()
+                ->whereDate("date_location", ">=", $debut)
+                ->whereDate("date_location", "<=", $fin)
+                ->whereNotNull("validated_at")
+                ->get();
+
+            Log::debug("Locations filtrées :", ["data" => $locations]);
+
+            $totaux = [
+                "total_amount" => number_format($locations->sum("total_amount"), 2, ",", " "),
+                "total_regler" => number_format($locations->sum("regler"), 2, ",", " "),
+                "total_reste_a_regler" => number_format($locations->sum("reste_a_regler"), 2, ",", " "),
+                "total_depense_amount" => number_format($locations->sum("depense_amount"), 2, ",", " "),
+            ];
+
+            Log::debug("Locations totaux :", ["data" => $totaux]);
+
+            return response()->json([
+                "locations" => LocationResource::collection($locations),
+                "totaux" => $totaux,
+                "client" => Client::firstWhere("id", $request->client_id),
+            ], 200);
+        } catch (\Illuminate\Validation\ValidationException $e) {
+            Log::debug("Erreur lors de la statistique", [
+                "data" => $e->errors()
+            ]);
+
+            return response()->json($e->errors(), 422);
+        }
+    }
+
+    /**
+     * Statistique par client.
+     */
+    public function statistiquesClient(Request $request)
+    {
+        try {
+            Log::debug("Les datas : ", ["datas" => $request->all()]);
+
+            if (!$request->client_id) {
+                return response()
+                    ->json([]);
+            }
+
+            // query
+            $locations = Location::latest()
+                ->where("client_id", $request->client_id)
+                ->whereNotNull("validated_at")
+                ->get();
+
+            Log::debug("Locations filtrées :", ["data" => $locations]);
+
+            $totaux = [
+                "total_amount" => number_format($locations->sum("total_amount"), 2, ",", " "),
+                "total_regler" => number_format($locations->sum("regler"), 2, ",", " "),
+                "total_reste_a_regler" => number_format($locations->sum("reste_a_regler"), 2, ",", " "),
+                "total_depense_amount" => number_format($locations->sum("depense_amount"), 2, ",", " "),
+            ];
+
+            Log::debug("Locations totaux :", ["data" => $totaux]);
+
+            return response()->json([
+                "locations" => LocationResource::collection($locations),
+                "totaux" => $totaux,
+                "client" => Client::firstWhere("id", $request->client_id),
             ], 200);
         } catch (\Illuminate\Validation\ValidationException $e) {
             Log::debug("Erreur de validation lors de la statistique", [
