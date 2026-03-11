@@ -37,7 +37,7 @@ class LocationRequest extends FormRequest
             "reference"           => ["nullable", Rule::unique("locations", "reference")->ignore($this->route("location"))],
 
             // details
-            "details"             => "nullable|array|min:1",
+            "details"             => "required|array|min:1",
 
             "details.*.camion_id"  => "required|exists:camions,id",
             "details.*.price"  => "required",
@@ -82,7 +82,7 @@ class LocationRequest extends FormRequest
             'contrat.max'      => 'Le contrat ne peut pas dépasser 5 Mo.',
 
             // details
-            'details.required'        => 'Le champ détails est obligatoire.',
+            'details.required'        => 'Ajouter au moins un camion.',
             'details.array'           => 'Le champ détails doit être un tableau.',
             'details.min'             => 'Vous devez ajouter au moins un détail.',
 
