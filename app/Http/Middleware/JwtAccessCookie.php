@@ -15,17 +15,10 @@ class JwtAccessCookie
             return response()->json(['error' => 'Unauthenticated'], 401);
         }
 
-        // $request->headers->set(
-        //     'Authorization',
-        //     'Bearer ' . $request->cookie('access_token')
-        // );
-
         Log::debug("JWT cokie called ....");
 
         try {
             $token = $request->cookie('access_token');
-
-            // Log::debug("JWT cokie called ....", ["cookie" => $token]);
 
             $user = JWTAuth::setToken($token)->authenticate();
 

@@ -182,6 +182,7 @@ class LocationController extends Controller
                 "locations" => LocationResource::collection($locations),
                 "totaux" => $totaux,
                 "client" => Client::firstWhere("id", $request->client_id),
+                "date" => $date
             ], 200);
         } catch (\Illuminate\Validation\ValidationException $e) {
             Log::debug("Erreur de validation lors de la statistique", [
@@ -207,6 +208,7 @@ class LocationController extends Controller
                 return response()
                     ->json([]);
             }
+
             // query
             $locations = Location::latest()
                 ->whereDate("date_location", ">=", $debut)

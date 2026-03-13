@@ -62,8 +62,9 @@ class AuthenticatedSessionController extends Controller
                 ], 401);
             }
 
-            $user = Auth::guard('api')->user();
-            $user['permissions'] = $user->getAllPermissions();
+            $user = Auth::guard('api')->user()->load("roles");
+            // $user['permissions'] = $user->getAllPermissions();
+            $user['permissions'] = $user->roles->flatMap->permissions;
             $all_permissions = Permission::get(["id", "name", "description"]);
             $all_roles = Role::with("permissions")
                 ->latest()->get();
