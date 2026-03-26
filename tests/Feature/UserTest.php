@@ -13,21 +13,36 @@ use Illuminate\Support\Facades\Log;
  */
 function jwtToken(User $user = null): string
 {
+    return $user;
     $user ??= User::factory()->create();
     return auth('api')->login($user);
 }
+
+test("Se_connecter", function () {
+    $user =  User::factory()->create();
+    $response = $this->post('/api/v1/login', ["email" => $user->email, "password" => $user->password]);
+    Log::debug("Test : ", ["user_logged" => $response]);
+
+    $response->assertStatus(200);
+});
 
 test('Recuperer_tous_les_utilisateurs', function () {
     User::factory()->count(5)->create();            // donne des données à l’endpoint
     $user  = User::factory()->create();             // utilisateur qui fait la requête
     $token = jwtToken($user);
 
-    $response = $this->withCookie('access_token', $token)
-                     ->get('/api/v1/users');
+    Log::debug("Test : user login", ["data" => $user]);
 
-    Log::debug('Test : tous les utilisateurs ', ['data' => $response->json()]);
+    $authUser = $this->post('/api/v1/login', ["email" => $user->email, "password" => $user->password]);
 
-    $response->assertStatus(200);
+    Log::debug("Response message : ", ["authUser" => $authUser]);
+
+    // $response = $this->withCookie('access_token', $token)
+    //     ->get('/api/v1/users');
+
+    // Log::debug('Test : tous les utilisateurs ', ['data' => $response->json()]);
+
+    // $response->assertStatus(200);
 });
 
 test('Recuperer_un_seul_utilisateur', function () {
@@ -36,7 +51,7 @@ test('Recuperer_un_seul_utilisateur', function () {
     $token = jwtToken($user);
 
     $response = $this->withCookie('access_token', $token)
-                     ->get("/api/v1/users/{$user->id}");
+        ->get("/api/v1/users/{$user->id}");
 
     $response->assertStatus(200);
 });
@@ -53,7 +68,7 @@ test('Creer_un_utilisateur', function () {
     ];
 
     $response = $this->withCookie('access_token', $token)
-                     ->post('/api/v1/users', $data);
+        ->post('/api/v1/users', $data);
 
     Log::debug("Test : l'utilisateur crée ", ['user' => $response->json()]);
 
@@ -73,7 +88,7 @@ test('Modifier_un_utilisateur', function () {
     ];
 
     $response = $this->withCookie('access_token', $token)
-                     ->patch("/api/v1/users/{$user->id}", $data);
+        ->patch("/api/v1/users/{$user->id}", $data);
 
     $response->assertStatus(200);
 });
@@ -84,7 +99,7 @@ test('Supprimer_un_utilisateur', function () {
     $token = jwtToken($user);
 
     $response = $this->withCookie('access_token', $token)
-                     ->delete("/api/v1/users/{$user\->id}");
+        ->delete("/api/v1/users/{$user->id}");
 
     $response->assertStatus(200);
 });

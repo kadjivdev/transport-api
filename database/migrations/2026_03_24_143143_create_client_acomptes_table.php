@@ -11,31 +11,26 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('depense_locations', function (Blueprint $table) {
+        Schema::create('client_acomptes', function (Blueprint $table) {
             $table->id();
-            $table->string("reference")->nullable()->unique();
-            $table->foreignId("location_id")
+            $table->string("reference")->nullable();
+            $table->foreignId("client_id")
                 ->nullable()
-                ->constrained("locations")
-                ->onUpdate("CASCADE")
+                ->constrained("clients", "id")
+                ->onUpdate('CASCADE')
                 ->onDelete("set null");
-            $table->foreignId("camion_id")
-                ->nullable()
-                ->constrained("camions")
-                ->onUpdate("CASCADE")
-                ->onDelete("set null");
-            $table->text("preuve")->nullable();
             $table->decimal("montant", 15, 2);
+            $table->text("preuve")->nullable();
             $table->text("commentaire")->nullable();
             $table->foreignId("created_by")
                 ->nullable()
-                ->constrained("users")
-                ->onUpdate("CASCADE")
+                ->constrained("users", "id")
+                ->onUpdate('CASCADE')
                 ->onDelete("set null");
             $table->foreignId("validated_by")
                 ->nullable()
-                ->constrained("users")
-                ->onUpdate("CASCADE")
+                ->constrained("users", "id")
+                ->onUpdate('CASCADE')
                 ->onDelete("set null");
             $table->date("validated_at")->nullable();
             $table->softDeletes();
@@ -48,6 +43,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('depense_locations');
+        Schema::dropIfExists('client_acomptes');
     }
 };

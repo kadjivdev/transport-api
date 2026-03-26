@@ -36,6 +36,7 @@ class PermissionSeeder extends Seeder
             'Locations' => $this->createCrudValidatePermissions('locations', 'location'),
             'Règlements' => $this->createCrudValidatePermissions('reglements', 'reglement'),
             'Dépenses' => $this->createCrudValidatePermissions('depenses', 'depense'),
+            'Acomptes' => $this->createCrudValidatePermissions('acomptes', 'acompte'),
         ];
 
         foreach ($permissions_groups as $group => $permissions) {

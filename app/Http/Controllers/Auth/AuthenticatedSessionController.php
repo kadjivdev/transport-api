@@ -40,6 +40,8 @@ class AuthenticatedSessionController extends Controller
     {
         Log::info("Trying to log in......");
         try {
+            Log::info("Debut validation ......");
+
             $request->validate(
                 [
                     'email' => ['required', 'string', 'email'],
@@ -57,6 +59,7 @@ class AuthenticatedSessionController extends Controller
             $credentials = $request->only('email', 'password');
 
             if (!$token = Auth::guard('api')->attempt($credentials)) {
+                Log::info("Unauthorized ......");
                 return response()->json([
                     'error' => 'Unauthorized'
                 ], 401);
@@ -107,7 +110,7 @@ class AuthenticatedSessionController extends Controller
             );
 
             Log::info("Connexion réussie avec succès!");
-            Log::info("Les cookies : ", ["cookies" => request()->cookies->all()]);
+            Log::info("Les cookies : ", ["cookies" => $request->cookies->all()]);
             return response()->json([
                 "message" => "Connexion réussie avec succès!",
                 "user" => $user,

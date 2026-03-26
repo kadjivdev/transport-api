@@ -16,6 +16,7 @@ class DepenseLocation extends Model
     protected $fillable = [
         "reference",
         "location_id",
+        "camion_id",
         "montant",
         "preuve",
         "commentaire",
@@ -28,6 +29,7 @@ class DepenseLocation extends Model
     // casts
     protected $casts = [
         "location_id" => "integer",
+        "camion_id" => "integer",
         "montant" => "decimal:2",
 
         "created_by" => "integer",
@@ -39,6 +41,11 @@ class DepenseLocation extends Model
     function location(): BelongsTo
     {
         return $this->belongsTo(Location::class, "location_id");
+    }
+
+    function camion(): BelongsTo
+    {
+        return $this->belongsTo(DepenseLocation::class, "camion_id");
     }
 
     function createdBy(): BelongsTo

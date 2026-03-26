@@ -5,7 +5,6 @@ namespace App\Http\Controllers;
 use App\Http\Requests\ReglementRequest;
 use App\Http\Resources\ReglementResource;
 use App\Models\ReglementLocation;
-use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
@@ -38,6 +37,10 @@ class ReglementLocationController extends Controller
         try {
             DB::beginTransaction();
             $reglement = ReglementLocation::create($request->validated());
+
+            // attach
+            $reglement->camions()
+                ->attach($request->camions);
 
             Log::debug("The reglement created :", ["data" => $reglement]);
 
@@ -79,12 +82,9 @@ class ReglementLocationController extends Controller
 
             $reglement->update($request->validated());
 
-            // $reglement->refresh();
-
-            // verification du reste à regler sur la location
-            if ($request->montant > $reglement->location?->reste_a_regler) {
-                throw new \Exception("Le montant maximum restant à régler sur cette location est de {{$reglement->location?->reste_a_regler}}");
-            }
+            // attach
+            $reglement->camions()
+                ->sync(collect($request->camions)->pluck("id"));
 
             DB::commit();
             Log::info("Reglement modifié avec succès");
@@ -126,8 +126,8 @@ class ReglementLocationController extends Controller
             DB::beginTransaction();
 
             // verification du reste à regler sur la location
-            if ($reglement->montant > $reglement->location?->reste_a_regler) {
-                throw new \Exception("Le montant maximum restant à régler sur cette location est de {{$reglement->location?->reste_a_regler}}");
+            if ($reglement->montant > $reglement->location?->client?->solde) {
+                throw new \Exception("Le solde maximum restant sur le compte de ce client est de {{$reglement->location?->client?->solde}}");
             }
 
             $reglement->update([

@@ -22,6 +22,8 @@ class ClientResource extends JsonResource
             "nom" => $this->nom,
             "prenom" => $this->prenom,
             "phone" => $this->phone,
+            "solde" => number_format($this->solde, 2, ",", " "),
+            "_solde" => $this->solde,
             "ifu" => $this->ifu,
             "createdAt" => Carbon::parse($this->created_at)->locale("fr")->isoFormat("D MMMM YYYY")
         ];

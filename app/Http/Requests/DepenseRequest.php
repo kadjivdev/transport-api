@@ -24,6 +24,7 @@ class DepenseRequest extends FormRequest
     {
         return [
             'location_id'    => 'sometimes|required|integer|exists:locations,id',
+            'camion_id'    => 'sometimes|required|integer|exists:camions,id',
             'montant'       => 'sometimes|required|numeric',
             'preuve'             => 'nullable|file|mimes:pdf,png,jpg,jpeg,doc,docx|max:5120', // max en Ko (5 Mo)
             "commentaire"         => "nullable",
@@ -41,6 +42,11 @@ class DepenseRequest extends FormRequest
             'location_id.required' => 'La location est obligatoire.',
             'location_id.integer'  => 'La location doit être un identifiant valide.',
             'location_id.exists'   => 'La location sélectionnée est invalide.',
+
+             // camion_id
+            'camion_id.required' => 'Le camion est obligatoire.',
+            'camion_id.integer'  => 'Le camion doit être valide.',
+            'camion_id.exists'   => 'Le camion sélectionnée est invalide.',
 
             // montant
             'montant.required'      => 'Le montant est réquis!.',

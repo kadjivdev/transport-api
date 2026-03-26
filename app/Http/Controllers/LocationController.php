@@ -79,7 +79,7 @@ class LocationController extends Controller
      */
     public function update(LocationRequest $request, Location $location)
     {
-        Log::info("Updating location ...", ["location" => $location->load("details"), "data" => $request->all()]);
+        Log::info("Updating location ...", ["data_update" => $request->all()]);
         try {
             DB::beginTransaction();
 
@@ -94,7 +94,7 @@ class LocationController extends Controller
             $location->details()
                 ->createMany($request->details);
 
-            $location->refresh();
+            // $location->refresh();
 
             DB::commit();
             Log::info("Location modifiée avec succès");

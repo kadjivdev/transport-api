@@ -20,14 +20,14 @@ class Location extends Model
         "reference",
         "client_id",
         "location_type_id",
-        "type_location_price",
-        "montant_total",
         "date_location",
         "contrat",
         "commentaire",
         "created_by",
         "validated_by",
-        "validated_at"
+        "validated_at",
+        "carriere",
+        "site_dechargement"
     ];
 
     // casts
@@ -51,7 +51,7 @@ class Location extends Model
 
     function type(): BelongsTo
     {
-        return $this->belongsTo(LocationType::class, "client_id");
+        return $this->belongsTo(LocationType::class, "location_type_id");
     }
 
     function details(): HasMany
@@ -100,7 +100,17 @@ class Location extends Model
     function getTotalAmountAttribute()
     {
         Log::info("getTotalAmount is Called.....");
-        return $this->details()->sum("price");
+
+        // return $this->details()->sum("price");
+        return $this->details->sum(function ($detail) {
+            Log::info("Le type de la location $this->id : $this->location_type_id");
+
+            if ($this->location_type_id === 3 && $detail->qte) { // type par tonnage
+                return $detail->price * $detail->qte;
+            }
+
+            return $detail->price;
+        });
     }
 
     // les reglements

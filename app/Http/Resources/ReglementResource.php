@@ -25,7 +25,8 @@ class ReglementResource extends JsonResource
             "commentaire" => $this->commentaire,
 
             // relations
-            "location" => $this->location,
+            "location" => $this->location->load(["client","details.camion"]),
+            "camions" => $this->camions,
             "createdAt" => Carbon::parse($this->created_at)->locale("fr")->isoFormat("D MMMM YYYY"),
             "createdBy" => $this->createdBy,
             "validatedBy" => $this->validatedBy,

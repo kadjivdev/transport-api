@@ -28,10 +28,12 @@ return new class extends Migration
                 ->constrained("location_types")
                 ->onUpdate("CASCADE")
                 ->onDelete("set null");
-            // $table->decimal("type_location_price", 15, 2);
-            $table->decimal("montant_total", 15, 2)->nullable();
             $table->date("date_location")->useCurrent();
             $table->text("contrat")->nullable();
+
+            $table->text("carriere")->nullable();
+            $table->text("site_dechargement")->nullable();
+
             $table->text("commentaire")->nullable();
             $table->foreignId("created_by")
                 ->nullable()

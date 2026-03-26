@@ -13,6 +13,7 @@ class LocationDetail extends Model
     protected $fillable = [
         "location_id",
         "camion_id",
+        "qte",
         "price"
     ];
 
@@ -20,7 +21,8 @@ class LocationDetail extends Model
     protected $casts = [
         "location_id" => "integer",
         "camion_id" => "integer",
-        "price" => "decimal:2"
+        "qte" => "decimal:2",
+        "price" => "decimal:2",
     ];
 
     // les relations

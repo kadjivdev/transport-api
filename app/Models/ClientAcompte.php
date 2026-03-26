@@ -5,46 +5,20 @@ namespace App\Models;
 use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
-use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Log;
 
-class ReglementLocation extends Model
+class ClientAcompte extends Model
 {
     use SoftDeletes;
 
-    protected $fillable = [
-        "reference",
-        "location_id",
-        "montant",
-        "preuve",
-        "commentaire",
-
-        "created_by",
-        "validated_by",
-        "validated_at"
-    ];
-
-    // casts
-    protected $casts = [
-        "location_id" => "integer",
-        "montant" => "decimal:2",
-
-        "created_by" => "integer",
-        "validated_by" => "integer",
-        "validated_at" => "datetime",
-    ];
+    protected $fillable = ["reference", "client_id", "montant", "preuve", "commentaire", "created_by", "validated_by", "validated_at"];
 
     // les relations
-    function location(): BelongsTo
+    function client(): BelongsTo
     {
-        return $this->belongsTo(Location::class, "location_id");
-    }
-
-    function camions(): BelongsToMany
-    {
-        return $this->belongsToMany(Camion::class, "camion_reglements", "reglement_id", "camion_id");
+        return $this->belongsTo(Client::class, "client_id");
     }
 
     function createdBy(): BelongsTo
@@ -80,12 +54,12 @@ class ReglementLocation extends Model
 
         $date = Carbon::now()->format("Y-m-d");
 
-        $prevRef = "REFR{$this->id}-{$date}";
+        $prevRef = "REFAC{$this->id}-{$date}";
         $prevRefExist = self::firstWhere("reference", $prevRef);
 
         if ($prevRefExist) {
             $idPlusOne = $this->id + 1;
-            $prevRef = "REFR{$idPlusOne}-{$date}";
+            $prevRef = "REFAC{$idPlusOne}-{$date}";
         }
         return $prevRef;
     }
@@ -112,6 +86,7 @@ class ReglementLocation extends Model
                 $model->preuve = $model->getPreuveUrl();
                 $model->saveQuietly(); // VERY IMPORTANT
             } else {
+                // retrait de la clé *preuve* des données
                 unset($model->preuve);
             }
         });

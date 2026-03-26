@@ -11,24 +11,19 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('location_details', function (Blueprint $table) {
+        Schema::create('camion_reglements', function (Blueprint $table) {
             $table->id();
-            $table->foreignId("location_id")
-                ->nullable()
-                ->constrained("locations")
-                ->onUpdate("CASCADE")
-                ->onDelete("set null");
-
             $table->foreignId("camion_id")
                 ->nullable()
-                ->constrained("camions")
-                ->onUpdate("CASCADE")
+                ->constrained("camions", "id")
+                ->onUpdate('CASCADE')
                 ->onDelete("set null");
-
-            $table->decimal("qte", 15, 2)->nullable();
-            $table->decimal("price", 15, 2);
+            $table->foreignId("reglement_id")
+                ->nullable()
+                ->constrained("reglement_locations", "id")
+                ->onUpdate('CASCADE')
+                ->onDelete("set null");
             $table->timestamps();
-            $table->softDeletes();
         });
     }
 
@@ -37,6 +32,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('location_details');
+        Schema::dropIfExists('camion_reglement');
     }
 };

@@ -23,23 +23,25 @@ class LocationRequest extends FormRequest
      */
     public  function rules(): array
     {
-        Log::debug("La requete en cours : ",["data"=>request()->all()]);
-        
+        Log::debug("La requete en cours : ", ["data" => request()->all()]);
+
         return [
             'client_id'           => 'required|integer|exists:clients,id',
             'location_type_id'    => 'required|integer|exists:location_types,id',
-            // 'type_location_price' => 'required',
             'montant_total'       => 'nullable',
             'date_location'       => 'required|date',
             'contrat'             => 'nullable|file|mimes:pdf,png,jpg,jpeg,doc,docx|max:5120', // max en Ko (5 Mo)
             "commentaire"         => "nullable",
 
-            "reference"           => ["nullable", Rule::unique("locations", "reference")->ignore($this->route("location"))],
+            "carriere" => 'nullable',
+            "site_dechargement" => 'nullable',
 
+            "reference"           => ["nullable", Rule::unique("locations", "reference")->ignore($this->route("location"))],
             // details
             "details"             => "required|array|min:1",
 
             "details.*.camion_id"  => "required|exists:camions,id",
+            "details.*.qte"  => "nullable",
             "details.*.price"  => "required",
         ];
     }
@@ -63,20 +65,11 @@ class LocationRequest extends FormRequest
             'location_type_id.integer'  => 'Le type de location doit être un identifiant valide.',
             'location_type_id.exists'   => 'Le type de location sélectionné est introuvable.',
 
-            // type_location_price
-            // 'type_location_price.required' => 'Le prix du type de location est obligatoire.',
-            // 'type_location_price.decimal'  => 'Le prix du type de location doit être un nombre décimal valide.',
-
-            // montant_total
-            // 'montant_total.required' => 'Le montant total est obligatoire.',
-            // 'montant_total.decimal'  => 'Le montant total doit être un nombre décimal valide.',
-
             // date_location
             'date_location.required' => 'La date de location est obligatoire.',
             'date_location.date'     => 'La date de location doit être une date valide.',
 
             // contrat
-            // 'contrat.required' => 'Le contrat est obligatoire.',
             'contrat.file'     => 'Le contrat doit être un fichier valide.',
             'contrat.mimes'    => 'Le contrat doit être au format PDF,PNG,JPG,JPEG ou Word (doc, docx).',
             'contrat.max'      => 'Le contrat ne peut pas dépasser 5 Mo.',

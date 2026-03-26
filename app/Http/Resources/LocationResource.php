@@ -26,6 +26,9 @@ class LocationResource extends JsonResource
             "contrat" => $this->contrat,
             "commentaire" => $this->commentaire,
 
+            "carriere" => $this->carriere,
+            "site_dechargement" => $this->site_dechargement,
+
             // relations
             "client" => $this->client,
             "date" => $this->date_location,

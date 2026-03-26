@@ -23,10 +23,11 @@ class ReglementRequest extends FormRequest
      */
     public function rules(): array
     {
-        Log::debug("The request reglement updating :",request()->all());
-        
+        Log::debug("The request reglement updating :", request()->all());
+
         return [
             'location_id'    => 'sometimes|required|integer|exists:locations,id',
+            'camions'    => 'required|array',
             'montant'       => 'sometimes|required|numeric',
             'preuve'             => 'nullable|file|mimes:pdf,png,jpg,jpeg,doc,docx|max:5120', // max en Ko (5 Mo)
             "commentaire"         => "nullable",
@@ -40,25 +41,21 @@ class ReglementRequest extends FormRequest
     public function messages(): array
     {
         return [
-            // location_id
-            'location_id.required' => 'La location est obligatoire.',
-            'location_id.integer'  => 'La location doit être un identifiant valide.',
-            'location_id.exists'   => 'La location sélectionnée est invalide.',
+            'location_id.required' => "La location est obligatoire.",
+            'location_id.integer' => "L'identifiant de la location doit être un nombre.",
+            'location_id.exists' => "La location sélectionnée est invalide.",
 
-            // montant
-            'montant.required'      => 'Le montant est réquis!.',
-            'montant.numeric'      => 'Le montant doit être un nombre valide.',
+            'camions.required' => "Veuillez sélectionner au moins un camion.",
+            'camions.array' => "Le format des camions est invalide.",
 
-            // preuve
-            'preuve.file'          => 'La preuve doit être un fichier.',
-            'preuve.mimes'         => 'La preuve doit être un fichier de type : pdf,png,jpg,jpeg, doc ou docx.',
-            'preuve.max'           => 'La preuve ne doit pas dépasser 5 Mo.',
+            'montant.required' => "Le montant est obligatoire.",
+            'montant.numeric' => "Le montant doit être un nombre.",
 
-            // reference
-            'reference.unique'     => 'Cette référence existe déjà.',
+            'preuve.file' => "Le fichier doit être valide.",
+            'preuve.mimes' => "Le fichier doit être de type : pdf, png, jpg, jpeg, doc ou docx.",
+            'preuve.max' => "Le fichier ne doit pas dépasser 5 Mo.",
 
-            // commentaire
-            // (nullable → pas de message nécessaire)
+            'reference.unique' => "Cette référence est déjà utilisée.",
         ];
     }
 }
