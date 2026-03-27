@@ -9,16 +9,16 @@ use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Log;
 
-class ClientAcompte extends Model
+class Tva extends Model
 {
     use SoftDeletes;
 
-    protected $fillable = ["reference", "client_id", "montant", "preuve", "commentaire", "created_by", "validated_by", "validated_at"];
+    protected $fillable = ["reference", "location_id", "montant", "preuve", "commentaire", "created_by", "validated_by", "validated_at"];
 
     // les relations
-    function client(): BelongsTo
+    function location(): BelongsTo
     {
-        return $this->belongsTo(Client::class, "client_id");
+        return $this->belongsTo(Location::class, "location_id");
     }
 
     function createdBy(): BelongsTo
@@ -54,7 +54,7 @@ class ClientAcompte extends Model
 
         $date = Carbon::now()->format("Y-m-d");
 
-        $prevRef = "REF{$this->id}-ACT-{$date}";
+        $prevRef = "REF{$this->id}-TVA-{$date}";
         $prevRefExist = self::firstWhere("reference", $prevRef);
 
         if ($prevRefExist) {

@@ -31,8 +31,14 @@ class Client extends Model
         return $this->hasMany(Location::class, "client_id");
     }
 
+    // backs
+    function backs(): HasMany
+    {
+        return $this->hasMany(FondBack::class, "client_id");
+    }
+
     // le solde du client
-    function getSoldeAttribute() 
+    function getSoldeAttribute()
     {
         return
             // approvisionnement
@@ -48,6 +54,21 @@ class Client extends Model
             }])
             ->get()
             ->flatMap->reglements // on recupère les reglements
+            ->sum("montant")
+            -
+            // retour de fond
+            $this->backs()
+            ->whereNotNull("validated_by")
+            ->sum("montant")
+            -
+            // reglements
+            $this->locations()
+            ->whereNotNull("validated_by") // locations validées
+            ->with(['tvas' => function ($query) {
+                $query->whereNotNull('validated_by'); // on filtre en meme temps les tvas validés
+            }])
+            ->get()
+            ->flatMap->tvas // on recupère les tvas
             ->sum("montant");
     }
 }

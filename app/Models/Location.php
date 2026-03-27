@@ -49,6 +49,11 @@ class Location extends Model
         return $this->belongsTo(Client::class, "client_id");
     }
 
+    function tvas(): HasMany
+    {
+        return $this->hasMany(Tva::class, "location_id");
+    }
+
     function type(): BelongsTo
     {
         return $this->belongsTo(LocationType::class, "location_type_id");
@@ -145,7 +150,7 @@ class Location extends Model
 
         $date = Carbon::now()->format("Y-m-d");
 
-        $prevRef = "REFL{$this->id}-{$date}";
+        $prevRef = "REF{$this->id}-LOC-{$date}";
         $prevRefExist = self::firstWhere("reference", $prevRef);
 
         if ($prevRefExist) {

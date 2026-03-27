@@ -13,7 +13,7 @@ Route::get("/debug", function () {
     return User::all();
 });
 
-// dernière route : toutes les requêtes non‑API reviennent au même point
-Route::get('/{any}', function () {
-    return view('app'); // ou welcome, app.blade.php, etc.
-})->where('any', '.*');
+// // dernière route : toutes les requêtes non‑API reviennent au même point
+// Route::get('/{any}', function () {
+//     return view('app'); // ou welcome, app.blade.php, etc.
+// })->where('any', '.*');

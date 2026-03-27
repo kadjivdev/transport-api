@@ -9,9 +9,11 @@ use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Log;
 
-class ClientAcompte extends Model
+class FondBack extends Model
 {
     use SoftDeletes;
+
+    protected $table = "fond_backs";
 
     protected $fillable = ["reference", "client_id", "montant", "preuve", "commentaire", "created_by", "validated_by", "validated_at"];
 
@@ -54,7 +56,7 @@ class ClientAcompte extends Model
 
         $date = Carbon::now()->format("Y-m-d");
 
-        $prevRef = "REF{$this->id}-ACT-{$date}";
+        $prevRef = "REF{$this->id}-BACK-{$date}";
         $prevRefExist = self::firstWhere("reference", $prevRef);
 
         if ($prevRefExist) {

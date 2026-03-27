@@ -80,7 +80,7 @@ class ReglementLocation extends Model
 
         $date = Carbon::now()->format("Y-m-d");
 
-        $prevRef = "REFR{$this->id}-{$date}";
+        $prevRef = "REF{$this->id}-RGL-{$date}";
         $prevRefExist = self::firstWhere("reference", $prevRef);
 
         if ($prevRefExist) {

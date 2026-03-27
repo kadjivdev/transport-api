@@ -5,7 +5,7 @@ namespace Database\Seeders;
 use Illuminate\Database\Seeder;
 use Spatie\Permission\Models\Permission;
 
-class PermissionSeeder extends Seeder
+class AddPermissionSeeder extends Seeder
 {
     /**
      * Run the database seeds.
@@ -24,20 +24,6 @@ class PermissionSeeder extends Seeder
     public function run(): void
     {
         $permissions_groups = [
-            "Utilisateurs" => $this->createCrudValidatePermissions("utilisateurs", "utilisateur"),
-            "Rôles" => array_merge(
-                ["Attribuer des roles aux utilisateurs" => "role.assign"],
-                ["Attribuer des permissions aux rôles" => "permission.assign"],
-                $this->createCrudValidatePermissions("rôles", "role"),
-            ),
-
-            "Camions" => $this->createCrudValidatePermissions("camions", "camion"),
-            'Clients' => $this->createCrudValidatePermissions('clients', 'client'),
-            'Locations' => $this->createCrudValidatePermissions('locations', 'location'),
-            'Règlements' => $this->createCrudValidatePermissions('reglements', 'reglement'),
-            'Dépenses' => $this->createCrudValidatePermissions('depenses', 'depense'),
-            'Acomptes' => $this->createCrudValidatePermissions('acomptes', 'acompte'),
-            'Backs' => $this->createCrudValidatePermissions('backs', 'back'),
             'Tvas' => $this->createCrudValidatePermissions('tvas', 'tva'),
         ];
 

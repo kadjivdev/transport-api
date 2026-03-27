@@ -45,7 +45,7 @@ class DepenseLocation extends Model
 
     function camion(): BelongsTo
     {
-        return $this->belongsTo(DepenseLocation::class, "camion_id");
+        return $this->belongsTo(Camion::class, "camion_id");
     }
 
     function createdBy(): BelongsTo
@@ -79,7 +79,7 @@ class DepenseLocation extends Model
     {
         $date = Carbon::now()->format("Y-m-d");
 
-        $prevRef = "REFD{$this->id}-{$date}";
+        $prevRef = "REF{$this->id}-DEP-{$date}";
         $prevRefExist = self::firstWhere("reference", $prevRef);
 
         if ($prevRefExist) {

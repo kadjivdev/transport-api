@@ -6,10 +6,12 @@ use App\Http\Controllers\ClientAcompteController;
 use App\Http\Controllers\ClientController;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\DepenseLocationController;
+use App\Http\Controllers\FondBackController;
 use App\Http\Controllers\LocationController;
 use App\Http\Controllers\LocationTypeController;
 use App\Http\Controllers\ReglementLocationController;
 use App\Http\Controllers\RoleController;
+use App\Http\Controllers\TvaController;
 use App\Http\Controllers\UserController;
 use Illuminate\Support\Facades\Route;
 
@@ -36,8 +38,18 @@ Route::prefix("/v1")->group(function () {
 
         // clients
         Route::apiResource("clients", ClientController::class)->except(["create", "edit"]);
+
+        // acomptes
         Route::apiResource("acomptes", ClientAcompteController::class)->except(["create", "edit",'show']);
         Route::post("/acomptes/validate/{acompte}", [ClientAcompteController::class, "validate"]);
+
+        // retour de fond
+        Route::apiResource("backs", FondBackController::class)->except(["create", "edit",'show']);
+        Route::post("/backs/validate/{back}", [FondBackController::class, "validate"]);
+
+        // tva
+        Route::apiResource("tvas", TvaController::class)->except(["create", "edit",'show']);
+        Route::post("/tvas/validate/{tva}", [TvaController::class, "validate"]);
 
         // locations
         Route::apiResource("locations", LocationController::class)->except(["create", "edit"]);
