@@ -16,6 +16,7 @@ class User extends Authenticatable implements JWTSubject
     /** @use HasFactory<\Database\Factories\UserFactory> */
     use HasFactory, Notifiable, SoftDeletes, HasRoles;
 
+    protected $appends = ["full_name"];
     /**
      * The attributes that are mass assignable.
      *
@@ -36,7 +37,12 @@ class User extends Authenticatable implements JWTSubject
         // 'password',
         'remember_token',
     ];
-
+    /**
+     * 
+     */
+    function getFullNameAttribute() {
+        return $this->name . ' ( ' . $this->email . ' )';
+    }
     /**
      * Get the attributes that should be cast.
      *
