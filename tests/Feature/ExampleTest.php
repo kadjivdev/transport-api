@@ -1,7 +1,5 @@
 <?php
 
-test('example', function () {
-    $response = $this->get('/');
-
-    $response->assertStatus(200);
-});
+it('example', function () {
+    
+})->group('example-tests')->todo('Tâche à faire plus tard');

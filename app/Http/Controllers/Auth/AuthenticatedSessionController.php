@@ -231,7 +231,7 @@ class AuthenticatedSessionController extends Controller
                 JWTAuth::setToken($request->cookie('access_token'))->invalidate();
             }
 
-            return response()->json(['message' => 'Logged out'])
+            return response()->json(['message' => 'Logged out'],200)
                 ->withCookie(Cookie::forget('access_token'))
                 ->withCookie(Cookie::forget('refresh_token'));
         } catch (\Throwable $th) {

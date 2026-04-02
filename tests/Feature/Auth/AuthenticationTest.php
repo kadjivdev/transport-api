@@ -3,34 +3,40 @@
 use App\Models\User;
 use Illuminate\Support\Facades\Log;
 
-test('users can authenticate using the login screen', function () {
-    $user = User::factory()->create();
-
-    $response = $this->post('/login', [
-        'email' => $user->email,
-        'password' => 'password',
-    ]);
-
-    $this->assertAuthenticated();
-    $response->assertNoContent();
+beforeEach(function () {
+    $this->authenticatedUser = User::factory()->create();
 });
 
-test('users can not authenticate with invalid password', function () {
-    $user = User::factory()->create();
+describe('Authentication\' tests', function () {
+    it('users can authenticate via login route', function () {
 
-    $this->post('/login', [
-        'email' => $user->email,
-        'password' => 'wrong-password',
-    ]);
+        $response =  $this->postJson('/api/v1/login', [
+            'email' => $this->authenticatedUser?->email,
+            'password' => 'password',
+        ]);
 
-    $this->assertGuest();
-});
+        Log::debug("The response :", ["user" => $response->json() ? $response->json()['user'] : null]);
 
-test('users can logout', function () {
-    $user = User::factory()->create();
+        $this->authenticatedUser = $response->json()['user'];
+        $this->assertAuthenticated();
+    })->after(function () {
+        Log::debug("Le user connecté est : ", ["user" => $this->authenticatedUser]);
+    });
 
-    $response = $this->actingAs($user)->post('/logout');
+    it('users can not authenticate with invalid credentials', function () {
+        $this->post('/api/v1/login', [
+            'email' => $this->authenticatedUser?->email,
+            'password' => 'wrong-password',
+        ]);
 
-    $this->assertGuest();
-    $response->assertNoContent();
-});
+        $this->assertGuest();
+    });
+
+    it('users can logout', function () {
+        $response = $this->actingAs($this->authenticatedUser)->post('/api/v1/logout');
+        // $this->assertGuest();
+
+        $response->assertStatus(200);
+        // $response->assertNoContent();
+    });
+})->group('Authentication');

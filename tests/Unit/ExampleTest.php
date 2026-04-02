@@ -5,5 +5,5 @@ it('true to be true', function () {
 });
 
 it('false to be false', function () {
-    expect("gogo")->toBeFalse();
+    expect(false)->toBeFalse();
 });
