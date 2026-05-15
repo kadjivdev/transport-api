@@ -5,7 +5,12 @@ use Illuminate\Support\Facades\Log;
 
 beforeEach(function () {
     $this->authenticatedUser = User::factory()->create();
-    $this->access_token = null;
+    $loginResponse =  $this->postJson('/api/v1/login', [
+        'email' => $this->authenticatedUser?->email,
+        'password' => 'password',
+    ]);
+
+    $this->access_token = $loginResponse->json()['access_token'];
 });
 
 describe('', function () {
@@ -16,31 +21,31 @@ describe('', function () {
             'password' => 'password',
         ]);
 
-        $cookies = $loginResponse->baseResponse->headers->getCookies();
-
-        $accessToken = collect($cookies)
-            ->firstWhere('Name', 'access_token')
-            ?->getValue();
-        $this->access_token = $accessToken;
+        $this->access_token = $loginResponse->json()['access_token'];
+        Log::debug("Le response d'accès est : ", ["response" => $loginResponse->json()['access_token']]);
 
         $this->assertAuthenticated();
     })->after(function () {
         Log::debug("Le user connecté est : ", ["user" => $this->authenticatedUser]);
-    })->only();
+    });
 
     it('new users can register', function () {
-        $response = $this->withCookie('access_token', $this->access_token)->post('/api/v1/users', [
-            'name' => 'Test User',
-            'email' => 'test@example.com',
-            'password' => 'password',
-            'password_confirmation' => 'password',
-        ]);
+        Log::debug("Le token est : ", ["access_token" => $this->access_token]);
 
+        $response = $this->withCookie('access_token', $this->access_token)
+            ->post('/api/v1/users', [
+                'name' => 'Test User',
+                'email' => 'test@example.com',
+                'password' => 'password',
+                'password_confirmation' => 'password',
+            ]);
+
+        Log::debug("The response :", ["response" => $response->json()]);
         $response->assertStatus(201);
         $this->assertDatabaseHas('users', [
             'email' => 'test@example.com',
         ]);
 
         Log::debug("The response :", ["response" => $response->json()]);
-    });
+    })->only();
 })->group('Registration');

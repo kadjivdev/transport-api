@@ -22,6 +22,8 @@ class Location extends Model
         "location_type_id",
         "date_location",
         "contrat",
+        "bordereau",
+        "bordereau_numero",
         "commentaire",
         "created_by",
         "validated_by",
@@ -101,6 +103,23 @@ class Location extends Model
         return $fileUrl;
     }
 
+    // handle  bordeareau file
+    function getBordereauUrl()
+    {
+        Log::info("getBordereauUrl is called ...");
+        $fileUrl = null;
+        if (request()->hasFile("bordereau")) {
+            $file = request()->file("bordereau");
+            $name = time() . "_" . $file->getClientOriginalName();
+            $file->move("bordereaux", $name);
+            $fileUrl = asset("/bordereaux/" . $name);
+        }
+
+        Log::debug("L'url du bordereau ", ["url" => $fileUrl]);
+
+        return $fileUrl;
+    }
+
     // handle total amount
     function getTotalAmountAttribute()
     {
@@ -173,11 +192,16 @@ class Location extends Model
         static::created(function ($model) {
             $model->reference = $model->generateReference();
             $model->contrat = $model->getContratUrl();
+            $model->bordereau = $model->getBordereauUrl();
             $model->saveQuietly(); // VERY IMPORTANT
         });
 
         static::updating(function ($model) {
             if (!request()->filled("contrat")) {
+                unset($model->contrat);
+            }
+
+            if (!request()->filled("bordereau")) {
                 unset($model->contrat);
             }
         });
@@ -186,8 +210,12 @@ class Location extends Model
         static::updated(function ($model) {
             if (request()->hasFile("contrat")) {
                 $model->contrat = $model->getContratUrl();
-                $model->saveQuietly(); // VERY IMPORTANT
             }
+
+            if (request()->hasFile("bordereau")) {
+                $model->bordereau = $model->getBordereauUrl();
+            }
+            $model->saveQuietly(); // VERY IMPORTANT
         });
     }
 }

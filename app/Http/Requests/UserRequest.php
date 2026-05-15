@@ -3,6 +3,7 @@
 namespace App\Http\Requests;
 
 use Illuminate\Foundation\Http\FormRequest;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Validation\Rule;
 
 class UserRequest extends FormRequest
@@ -22,6 +23,7 @@ class UserRequest extends FormRequest
      */
     public function rules(): array
     {
+        Log::debug("Validating user data...", ["data" => $this->all()]);
         $userId = $this->route('user'); // ou auth()->id() selon ton cas
 
         return [

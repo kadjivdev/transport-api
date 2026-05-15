@@ -24,6 +24,8 @@ class LocationResource extends JsonResource
             "_reste" => $this->reste_a_regler,
             "depenseAmount" => number_format($this->depense_amount, 2, ",", " "),
             "contrat" => $this->contrat,
+            "bordereau" => $this->bordereau,
+            "bordereau_numero" => $this->bordereau_numero,
             "commentaire" => $this->commentaire,
 
             "carriere" => $this->carriere,

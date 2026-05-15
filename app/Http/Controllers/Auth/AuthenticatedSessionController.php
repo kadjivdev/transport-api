@@ -16,7 +16,6 @@ use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Str;
 use Illuminate\Validation\ValidationException;
 use Spatie\Permission\Models\Permission;
-use Spatie\Permission\Models\Role as ModelsRole;
 use Tymon\JWTAuth\Exceptions\JWTException;
 use Tymon\JWTAuth\Facades\JWTAuth;
 
@@ -231,7 +230,7 @@ class AuthenticatedSessionController extends Controller
                 JWTAuth::setToken($request->cookie('access_token'))->invalidate();
             }
 
-            return response()->json(['message' => 'Logged out'],200)
+            return response()->json(['message' => 'Logged out'], 200)
                 ->withCookie(Cookie::forget('access_token'))
                 ->withCookie(Cookie::forget('refresh_token'));
         } catch (\Throwable $th) {

@@ -7,12 +7,11 @@ use App\Http\Resources\LocationResource;
 use App\Models\Client;
 use App\Models\Location;
 use Carbon\Carbon;
+use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Validation\ValidationException;
-use Symfony\Component\HttpFoundation\Request;
-use function Symfony\Component\Clock\now;
 
 class LocationController extends Controller
 {

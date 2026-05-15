@@ -31,6 +31,8 @@ class LocationRequest extends FormRequest
             'montant_total'       => 'nullable',
             'date_location'       => 'required|date',
             'contrat'             => 'nullable|file|mimes:pdf,png,jpg,jpeg,doc,docx|max:5120', // max en Ko (5 Mo)
+            'bordereau'             => 'nullable|file|mimes:pdf,png,jpg,jpeg,doc,docx|max:5120', // max en Ko (5 Mo)
+            "bordereau_numero"         => "nullable",
             "commentaire"         => "nullable",
 
             "carriere" => 'nullable',
