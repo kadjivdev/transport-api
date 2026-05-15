@@ -29,7 +29,7 @@ class ClientRequest extends FormRequest
                 "required",
                 Rule::unique('clients', 'phone')->ignore($this->route("client")),
             ],
-            "ifu" => ["required", Rule::unique('clients', 'phone')->ignore($this->route("client"))],
+            "ifu" => ["nullable", Rule::unique('clients', 'phone')->ignore($this->route("client"))],
         ];
     }
 
