@@ -25,6 +25,8 @@ class LocationRequest extends FormRequest
     {
         Log::debug("La requete en cours : ", ["data" => request()->all()]);
 
+        $locationId = $this->route("location");
+
         return [
             'client_id'           => 'required|integer|exists:clients,id',
             'location_type_id'    => 'required|integer|exists:location_types,id',
@@ -32,7 +34,7 @@ class LocationRequest extends FormRequest
             'date_location'       => 'required|date',
             'contrat'             => 'nullable|file|mimes:pdf,png,jpg,jpeg,doc,docx|max:5120', // max en Ko (5 Mo)
             'bordereau'             => 'nullable|file|mimes:pdf,png,jpg,jpeg,doc,docx|max:5120', // max en Ko (5 Mo)
-            "bordereau_numero"         => "nullable",
+            "bordereau_numero"         => "nullable|unique:locations,bordereau_numero," . $this->route("location"),
             "commentaire"         => "nullable",
 
             "carriere" => 'nullable',
