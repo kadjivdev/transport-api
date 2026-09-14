@@ -55,7 +55,7 @@ class ClientController extends Controller
     public function show(Client $client)
     {
         Log::debug("The client called!", ["data" => $client]);
-        return response()->json($client);
+        return response()->json($client->load("acomptes"));
     }
 
     /**
