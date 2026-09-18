@@ -22,6 +22,9 @@ Route::prefix("/v1")->group(function () {
     Route::post('/refresh', [AuthenticatedSessionController::class, 'refresh'])
         ->name('refresh');
 
+    Route::post('/me', [AuthenticatedSessionController::class, 'me'])
+        ->name('me');
+
     // Logout route
     Route::post('/logout', [AuthenticatedSessionController::class, 'logout']) // old destroy
         ->name('logout');
@@ -40,15 +43,15 @@ Route::prefix("/v1")->group(function () {
         Route::apiResource("clients", ClientController::class)->except(["create", "edit"]);
 
         // acomptes
-        Route::apiResource("acomptes", ClientAcompteController::class)->except(["create", "edit",'show']);
+        Route::apiResource("acomptes", ClientAcompteController::class)->except(["create", "edit", 'show']);
         Route::post("/acomptes/validate/{acompte}", [ClientAcompteController::class, "validate"]);
 
         // retour de fond
-        Route::apiResource("backs", FondBackController::class)->except(["create", "edit",'show']);
+        Route::apiResource("backs", FondBackController::class)->except(["create", "edit", 'show']);
         Route::post("/backs/validate/{back}", [FondBackController::class, "validate"]);
 
         // tva
-        Route::apiResource("tvas", TvaController::class)->except(["create", "edit",'show']);
+        Route::apiResource("tvas", TvaController::class)->except(["create", "edit", 'show']);
         Route::post("/tvas/validate/{tva}", [TvaController::class, "validate"]);
 
         // locations

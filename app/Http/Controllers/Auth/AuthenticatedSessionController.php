@@ -65,51 +65,56 @@ class AuthenticatedSessionController extends Controller
             }
 
             $user = Auth::guard('api')->user()->load("roles");
-            // $user['permissions'] = $user->getAllPermissions();
             $user['permissions'] = $user->roles->flatMap->permissions;
-            $all_permissions = Permission::get(["id", "name", "description"]);
-            $all_roles = Role::with("permissions")
-                ->latest()->get();
 
-            // Créer refresh token
+            // ⚠️ À restreindre si possible (ex: seulement pour les users avec droit d'admin)
+            $all_permissions = Permission::get(["id", "name", "description"]);
+            $all_roles = Role::with("permissions")->latest()->get();
+
+            // Créer refresh token : on génère un token en clair, on stocke son hash
+            $plainRefreshToken = Str::random(64);
+
             $refreshToken = RefreshToken::create([
                 'user_id' => $user->id,
-                'token' => hash('sha256', Str::random(64)),
-                'expires_at' => now()->addMinute((int) env("JWT_REFRESH_TTL")),
+                'token' => hash('sha256', $plainRefreshToken),
+                'expires_at' => now()->addMinutes((int) env("JWT_REFRESH_TTL")),
             ]);
 
-            /**
-             * Création du cookie
-             * */
+            $isProduction = app()->environment('production');
 
-            // Access Cookie
+            /**
+             * Création des cookies
+             */
+
+            // Access token : httpOnly pour empêcher le vol via XSS.
+            // Le navigateur l'enverra automatiquement, pas besoin de le lire en JS.
             $access_cookie = cookie(
-                'access_token',                 // nom
-                $token,                         // valeur
-                (int) env("JWT_TTL"),               // durée en minutes
-                '/',                            // path
-                null,                           // domain
-                false,                           // $secure,          // secure
-                true,                           // httpOnly
-                false,                          // raw
-                'Lax',                         // $sameSite       // sameSite
+                'access_token',
+                $token,
+                (int) env("JWT_TTL"),
+                '/',
+                null,
+                $isProduction,   // secure : true en prod (HTTPS)
+                true,            // httpOnly : true
+                false,
+                'Lax',
             );
 
-            // Refresh token
+            // Refresh token : on envoie le token en clair, la DB ne garde que le hash
             $refresh_token = cookie(
-                'refresh_token',                // nom
-                $refreshToken->token,           // valeur
-                (int) env("JWT_REFRESH_TTL"),   // durée en minutes
-                '/',                            // path
-                null,                           // domain
-                false,                          // $secure,          // secure
-                true,                           // httpOnly
-                false,                          // raw
+                'refresh_token',
+                $plainRefreshToken,
+                (int) env("JWT_REFRESH_TTL"),
+                '/',
+                null,
+                $isProduction,   // secure
+                true,            // httpOnly
+                false,
                 'Lax',
             );
 
             Log::info("Connexion réussie avec succès!");
-            Log::info("Les cookies : ", ["cookies" => $request->cookies->all()]);
+
             return response()->json([
                 "message" => "Connexion réussie avec succès!",
                 "user" => $user,
@@ -119,14 +124,13 @@ class AuthenticatedSessionController extends Controller
                 ->withCookie($access_cookie)
                 ->withCookie($refresh_token);
         } catch (ValidationException $e) {
-            Log::error("Erreure de validation survenue lors de la connexion", ["error" => $e->errors()]);
+            Log::error("Erreur de validation survenue lors de la connexion", ["error" => $e->errors()]);
             return response()->json(["errors" => $e->errors()], 422);
         } catch (Exception $e) {
-            Log::error("Erreure d'exception survenue lors de la connexion", ["error" => $e->getMessage()]);
-            return response()->json(["error" => $e->getMessage()], 500);
+            Log::error("Erreur d'exception survenue lors de la connexion", ["error" => $e->getMessage()]);
+            return response()->json(["error" => "Une erreur interne est survenue."], 500);
         }
     }
-
     /**
      * Checking if access token existe in cookie
      */
@@ -163,54 +167,78 @@ class AuthenticatedSessionController extends Controller
     public function refresh(Request $request)
     {
         try {
-            //code...
             Log::info("Refreshing du token refresh ...");
-            $refreshTokenValue = $request->cookie('refresh_token');
 
-            Log::debug("The refresh token ", ["token" => $refreshTokenValue]);
-            Log::info("Les cookies : ", ["cookies" => request()->cookies->all()]);
-            Log::info("Le header autorization : ", ["autorization" => request()->header('authorization')]);
+            $refreshTokenValue = $request->cookie('refresh_token');
 
             if (!$refreshTokenValue) {
                 return response()->json(['error' => 'No refresh token'], 401);
             }
 
-            $refreshToken = RefreshToken::where('token', $refreshTokenValue)
+            $hashedToken = hash('sha256', $refreshTokenValue);
+
+            $refreshToken = RefreshToken::where('token', $hashedToken)
                 ->where('expires_at', '>', now())
                 ->first();
 
             if (!$refreshToken) {
+                Log::info("Refresh token invalide ou expiré.");
                 return response()->json(['error' => 'Invalid refresh token'], 401);
             }
 
             $user = $refreshToken->user;
 
-            // Créer nouveau access token
-            $accessToken = JWTAuth::fromUser($user);
+            // Rotation : on invalide l'ancien refresh token
+            $refreshToken->delete();
 
-            // $secure = app()->environment('production');
-            // $sameSite = $secure ? 'None' : 'Lax';
+            // Nouveau access token
+            $newAccessToken = JWTAuth::fromUser($user);
 
-            $accessToken = cookie(
+            // Nouveau refresh token (rotation)
+            $plainRefreshToken = Str::random(64);
+            RefreshToken::create([
+                'user_id' => $user->id,
+                'token' => hash('sha256', $plainRefreshToken),
+                'expires_at' => now()->addMinutes((int) env("JWT_REFRESH_TTL")),
+            ]);
+
+            $isProduction = app()->environment('production');
+
+            $access_cookie = cookie(
                 'access_token',
-                $accessToken,
+                $newAccessToken,
                 (int) env("JWT_TTL"),
                 '/',
-                null,                           // domain
-                false,                          // $secure,          // secure
-                true,                           // httpOnly
-                false,                          // raw
+                null,
+                $isProduction,
+                true,   // httpOnly
+                false,
                 'Lax',
             );
 
+            $refresh_cookie = cookie(
+                'refresh_token',
+                $plainRefreshToken,
+                (int) env("JWT_REFRESH_TTL"),
+                '/',
+                null,
+                $isProduction,
+                true,   // httpOnly
+                false,
+                'Lax',
+            );
+
+            Log::info("Token rafraîchi avec succès pour l'utilisateur {$user->id}.");
+
             return response()->json(['message' => 'Token refreshed'])
-                ->withCookie($accessToken);
+                ->withCookie($access_cookie)
+                ->withCookie($refresh_cookie);
         } catch (JWTException $e) {
-            Log::debug("Une erreure est survenue lors du refreh ", ["error" => $e->getMessage()]);
-            return response()->json(["error" => $e->getMessage()]);
+            Log::error("Erreur JWT lors du refresh", ["error" => $e->getMessage()]);
+            return response()->json(["error" => "Impossible de rafraîchir le token."], 401);
         } catch (Exception $e) {
-            Log::debug("Une erreure est survenue lors du refreh ", ["error" => $e->getMessage()]);
-            return response()->json(["error" => $e->getMessage()]);
+            Log::error("Erreur lors du refresh", ["error" => $e->getMessage()]);
+            return response()->json(["error" => "Une erreur interne est survenue."], 500);
         }
     }
 
@@ -236,5 +264,22 @@ class AuthenticatedSessionController extends Controller
         } catch (\Throwable $th) {
             throw $th;
         }
+    }
+
+    /**
+     * Me
+     */
+    public function me(Request $request)
+    {
+        $user = Auth::guard('api')->user();
+
+        if (!$user) {
+            return response()->json(['error' => 'Unauthenticated'], 401);
+        }
+
+        $user->load('roles');
+        $user['permissions'] = $user->roles->flatMap->permissions;
+
+        return response()->json(['user' => $user]);
     }
 }
