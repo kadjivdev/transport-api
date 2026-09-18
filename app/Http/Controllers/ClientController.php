@@ -8,6 +8,7 @@ use App\Models\Client;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Validation\ValidationException;
+use Psy\Readline\Hoa\Console;
 
 class ClientController extends Controller
 {
@@ -37,7 +38,7 @@ class ClientController extends Controller
 
             DB::commit();
             Log::info("Client crée avec succès");
-            return response()->json(["message" => "Client.e crée.e avec succès"],201);
+            return response()->json(["message" => "Client.e crée.e avec succès"], 201);
         } catch (ValidationException $e) {
             Log::debug("Erreure de validation", ["errors" => $e->errors()]);
             DB::rollBack();
@@ -55,7 +56,11 @@ class ClientController extends Controller
     public function show(Client $client)
     {
         Log::debug("The client called!", ["data" => $client]);
-        return response()->json($client->load("acomptes"));
+        $client->load(["acomptes", "locations.reglements"]);
+        $client->reglements = $client->locations->flatMap->reglements;
+
+        Log::debug("Client to show:", ["data" => $client]);
+        return response()->json($client);
     }
 
     /**

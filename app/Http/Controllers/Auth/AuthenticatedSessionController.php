@@ -77,7 +77,7 @@ class AuthenticatedSessionController extends Controller
             $refreshToken = RefreshToken::create([
                 'user_id' => $user->id,
                 'token' => hash('sha256', $plainRefreshToken),
-                'expires_at' => now()->addMinutes((int) env("JWT_REFRESH_TTL")),
+                'expires_at' => now()->addMinutes((int) config('jwt.refresh_ttl')),
             ]);
 
             $isProduction = app()->environment('production');
@@ -91,11 +91,11 @@ class AuthenticatedSessionController extends Controller
             $access_cookie = cookie(
                 'access_token',
                 $token,
-                (int) env("JWT_TTL"),
+                (int) config('jwt.ttl'),
                 '/',
                 null,
                 $isProduction,   // secure : true en prod (HTTPS)
-                true,            // httpOnly : true
+                true,             // httpOnly
                 false,
                 'Lax',
             );
@@ -104,7 +104,7 @@ class AuthenticatedSessionController extends Controller
             $refresh_token = cookie(
                 'refresh_token',
                 $plainRefreshToken,
-                (int) env("JWT_REFRESH_TTL"),
+                (int) config('jwt.refresh_ttl'),
                 '/',
                 null,
                 $isProduction,   // secure
@@ -199,7 +199,7 @@ class AuthenticatedSessionController extends Controller
             RefreshToken::create([
                 'user_id' => $user->id,
                 'token' => hash('sha256', $plainRefreshToken),
-                'expires_at' => now()->addMinutes((int) env("JWT_REFRESH_TTL")),
+                'expires_at' => now()->addMinutes((int) config('jwt.refresh_ttl')),
             ]);
 
             $isProduction = app()->environment('production');
@@ -207,11 +207,11 @@ class AuthenticatedSessionController extends Controller
             $access_cookie = cookie(
                 'access_token',
                 $newAccessToken,
-                (int) env("JWT_TTL"),
+                (int) config('jwt.ttl'),
                 '/',
                 null,
                 $isProduction,
-                true,   // httpOnly
+                true,    // httpOnly
                 false,
                 'Lax',
             );
@@ -219,7 +219,7 @@ class AuthenticatedSessionController extends Controller
             $refresh_cookie = cookie(
                 'refresh_token',
                 $plainRefreshToken,
-                (int) env("JWT_REFRESH_TTL"),
+                (int) config('jwt.refresh_ttl'),
                 '/',
                 null,
                 $isProduction,
