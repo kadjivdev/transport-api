@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Http\Requests\ClientRequest;
 use App\Http\Resources\ClientResource;
+use App\Http\Resources\LocationResource;
 use App\Models\Client;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
@@ -58,6 +59,7 @@ class ClientController extends Controller
         Log::debug("The client called!", ["data" => $client]);
         $client->load(["acomptes", "locations.reglements"]);
         $client->reglements = $client->locations->flatMap->reglements;
+        $client->_locations = LocationResource::collection($client->locations);
 
         Log::debug("Client to show:", ["data" => $client]);
         return response()->json($client);
