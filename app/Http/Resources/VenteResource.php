@@ -6,7 +6,7 @@ use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\JsonResource;
 use Illuminate\Support\Carbon;
 
-class ReglementResource extends JsonResource
+class VenteResource extends JsonResource
 {
     /**
      * Transform the resource into an array.
@@ -18,18 +18,25 @@ class ReglementResource extends JsonResource
         return [
             "id" => $this->id,
             "code" => $this->code,
-            "vente" => $this->whenLoaded("vente"),
-            "montant" => $this->montant,
+            "achat" => $this->whenLoaded("achat"),
+            "client" => $this->whenLoaded("client"),
+            "camion" => $this->whenLoaded("camion"),
+            "qte" => $this->qte,
+            "unitePrice" => $this->unite_price,
+            "_amount" => $this->amount,
+            "amount" => number_format($this->amount, 2, ",", " "),
+            "reste" => number_format($this->reste, 2, ",", " "),
+            "lieuDechargement" => $this->lieu_dechargement,
             "observation" => $this->observation,
             "document" => $this->document,
-            "createdBy" => $this->createdBy,
+            "createdBy" => $this->whenLoaded("createdBy"),
             "validatedAt" => $this->validated_at
                 ? Carbon::parse($this->validated_at)->locale("fr")->isoFormat("D MMMM YYYY")
                 : null,
             "createdAt" => $this->created_at
                 ? Carbon::parse($this->created_at)->locale("fr")->isoFormat("D MMMM YYYY")
                 : null,
-            "validatedBy" => $this->validatedBy,
+            "validatedBy" => $this->whenLoaded("validatedBy"),
         ];
     }
 }

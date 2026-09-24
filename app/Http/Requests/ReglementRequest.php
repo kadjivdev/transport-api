@@ -3,8 +3,6 @@
 namespace App\Http\Requests;
 
 use Illuminate\Foundation\Http\FormRequest;
-use Illuminate\Support\Facades\Log;
-use Illuminate\Validation\Rule;
 
 class ReglementRequest extends FormRequest
 {
@@ -23,15 +21,11 @@ class ReglementRequest extends FormRequest
      */
     public function rules(): array
     {
-        Log::debug("The request reglement updating :", request()->all());
-
         return [
-            'location_id'    => 'sometimes|required|integer|exists:locations,id',
-            'camions'    => 'required|array',
-            'montant'       => 'sometimes|required|numeric',
-            'preuve'             => 'nullable|file|mimes:pdf,png,jpg,jpeg,doc,docx|max:5120', // max en Ko (5 Mo)
-            "commentaire"         => "nullable",
-            "reference"           => ["nullable", Rule::unique("reglement_locations", "reference")->ignore($this->route("reglement"))],
+            "vente_id" => "required|integer|exists:ventes,id",
+            "montant" => "required|numeric|min:0.01",
+            "observation" => "nullable|string",
+            "document" => "nullable|file|mimes:pdf,png,jpg,jpeg,doc,docx|max:5120",
         ];
     }
 
@@ -41,21 +35,25 @@ class ReglementRequest extends FormRequest
     public function messages(): array
     {
         return [
-            'location_id.required' => "La location est obligatoire.",
-            'location_id.integer' => "L'identifiant de la location doit être un nombre.",
-            'location_id.exists' => "La location sélectionnée est invalide.",
-
-            'camions.required' => "Veuillez sélectionner au moins un camion.",
-            'camions.array' => "Le format des camions est invalide.",
-
+            'vente_id.required' => "La vente est obligatoire.",
+            'vente_id.integer' => "L'identifiant de la vente doit être un nombre.",
+            'vente_id.exists' => "La vente sélectionnée est invalide.",
             'montant.required' => "Le montant est obligatoire.",
             'montant.numeric' => "Le montant doit être un nombre.",
+            'montant.min' => "Le montant doit être supérieur à 0.",
+            'document.file' => "Le fichier doit être valide.",
+            'document.mimes' => "Le fichier doit être de type : pdf, png, jpg, jpeg, doc ou docx.",
+            'document.max' => "Le fichier ne doit pas dépasser 5 Mo.",
+        ];
+    }
 
-            'preuve.file' => "Le fichier doit être valide.",
-            'preuve.mimes' => "Le fichier doit être de type : pdf, png, jpg, jpeg, doc ou docx.",
-            'preuve.max' => "Le fichier ne doit pas dépasser 5 Mo.",
-
-            'reference.unique' => "Cette référence est déjà utilisée.",
+    public function attributes(): array
+    {
+        return [
+            "vente_id" => "vente",
+            "montant" => "montant",
+            "observation" => "observation",
+            "document" => "document",
         ];
     }
 }

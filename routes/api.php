@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\AchatController;
 use App\Http\Controllers\Auth\AuthenticatedSessionController;
 use App\Http\Controllers\CamionController;
 use App\Http\Controllers\ClientAcompteController;
@@ -7,12 +8,16 @@ use App\Http\Controllers\ClientController;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\DepenseLocationController;
 use App\Http\Controllers\FondBackController;
+use App\Http\Controllers\FournisseurController;
 use App\Http\Controllers\LocationController;
 use App\Http\Controllers\LocationTypeController;
+use App\Http\Controllers\ProductController;
 use App\Http\Controllers\ReglementLocationController;
+use App\Http\Controllers\ReglementController;
 use App\Http\Controllers\RoleController;
 use App\Http\Controllers\TvaController;
 use App\Http\Controllers\UserController;
+use App\Http\Controllers\VenteController;
 use Illuminate\Support\Facades\Route;
 
 Route::prefix("/v1")->group(function () {
@@ -68,5 +73,24 @@ Route::prefix("/v1")->group(function () {
         Route::post("/locations/validate/{location}", [LocationController::class, "validate"])->name("location.validate");
         Route::post("/depenses/validate/{depense}", [DepenseLocationController::class, "validate"]);
         Route::post("/reglements/validate/{reglement}", [ReglementLocationController::class, "validate"]);
+
+        // products
+        Route::apiResource("products", ProductController::class);
+
+        // fournisseurs
+        Route::apiResource("fournisseurs", FournisseurController::class);
+
+        // achats
+        Route::get("/achats/validated", [AchatController::class, "achatValidated"]);
+        Route::apiResource("achats", AchatController::class);
+        Route::post("/achats/{achat}/validate", [AchatController::class, "validateAchat"]);
+
+        // ventes
+        Route::get("/ventes/validated", [VenteController::class, "venteValidated"]);
+        Route::apiResource("ventes", VenteController::class)->except(["create", "edit"]);
+        Route::post("/ventes/{vente}/validate", [VenteController::class, "validateVente"]);
+
+        Route::apiResource("vente-reglements", ReglementController::class)->except(["create", "edit"]);
+        Route::post("/vente-reglements/{reglement}/validate", [ReglementController::class, "validateReglement"]);
     });
 });
