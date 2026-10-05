@@ -2,8 +2,8 @@
 
 namespace App\Http\Controllers;
 
-use App\Http\Requests\ReglementRequest;
-use App\Http\Resources\ReglementResource;
+use App\Http\Requests\ReglementLocationRequest;
+use App\Http\Resources\ReglementLocationResource;
 use App\Models\ReglementLocation;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
@@ -17,10 +17,12 @@ class ReglementLocationController extends Controller
      */
     public function index()
     {
-        Log::info("Chargement de tous les reglements");
-        $reglements = ReglementLocation::latest()->get();
+        Log::info("Chargement de tous les reglements locations");
+        $reglements = ReglementLocation::with(["location", "camions", "createdBy", "validatedBy"])
+            ->latest()
+            ->get();
 
-        $data = ReglementResource::collection($reglements);
+        $data = ReglementLocationResource::collection($reglements);
         if ($reglements->isEmpty()) {
             return response()->json($data, 204);
         }
@@ -30,7 +32,7 @@ class ReglementLocationController extends Controller
     /**
      * Store a newly created resource in storage.
      */
-    public function store(ReglementRequest $request)
+    public function store(ReglementLocationRequest $request)
     {
         Log::info("Début d'insertion des reglements", ["data" => $request->all()]);
         Log::info("The user connected", ["user" => Auth::user()]);
@@ -64,13 +66,15 @@ class ReglementLocationController extends Controller
     public function show(ReglementLocation $reglement)
     {
         Log::debug("The reglement called!", ["data" => $reglement]);
-        return response()->json($reglement->load(["location", "createdBy", "validatedBy"]));
+        return new ReglementLocationResource(
+            $reglement->load(["location", "camions", "createdBy", "validatedBy"])
+        );
     }
 
     /**
      * Update the specified resource in storage.
      */
-    public function update(ReglementRequest $request, ReglementLocation $reglement)
+    public function update(ReglementLocationRequest $request, ReglementLocation $reglement)
     {
         Log::info("Updating reglement ...", ["reglement" => $reglement, "data" => $request->all()]);
         try {

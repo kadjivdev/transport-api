@@ -13,7 +13,7 @@ use App\Http\Controllers\LocationController;
 use App\Http\Controllers\LocationTypeController;
 use App\Http\Controllers\ProductController;
 use App\Http\Controllers\ReglementLocationController;
-use App\Http\Controllers\ReglementController;
+use App\Http\Controllers\ReglementVenteController;
 use App\Http\Controllers\RoleController;
 use App\Http\Controllers\TvaController;
 use App\Http\Controllers\UserController;
@@ -35,7 +35,7 @@ Route::prefix("/v1")->group(function () {
         ->name('logout');
 
     // Protected routes
-    Route::middleware(['jwt.from.cookie'])->group(function () {
+    // Route::middleware(['jwt.from.cookie'])->group(function () {
         Route::get("/dashboard", DashboardController::class)->name("dahsboard");
         Route::get("/permissions", [RoleController::class, "getPermissions"])->name("permissions");
         Route::post("/affect-role", [RoleController::class, "affectRole"])->name("affect-role");
@@ -90,7 +90,7 @@ Route::prefix("/v1")->group(function () {
         Route::apiResource("ventes", VenteController::class)->except(["create", "edit"]);
         Route::post("/ventes/{vente}/validate", [VenteController::class, "validateVente"]);
 
-        Route::apiResource("vente-reglements", ReglementController::class)->except(["create", "edit"]);
-        Route::post("/vente-reglements/{reglement}/validate", [ReglementController::class, "validateReglement"]);
-    });
+        Route::apiResource("vente-reglements", ReglementVenteController::class)->except(["create", "edit"]);
+        Route::post("/vente-reglements/{reglement}/validate", [ReglementVenteController::class, "validateReglement"]);
+    // });
 });

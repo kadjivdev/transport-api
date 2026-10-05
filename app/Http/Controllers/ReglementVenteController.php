@@ -2,15 +2,15 @@
 
 namespace App\Http\Controllers;
 
-use App\Http\Requests\ReglementRequest;
-use App\Http\Resources\ReglementResource;
+use App\Http\Requests\ReglementVenteRequest;
+use App\Http\Resources\ReglementVenteResource;
 use App\Models\Reglement;
 use Exception;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 
-class ReglementController extends Controller
+class ReglementVenteController extends Controller
 {
     public function index()
     {
@@ -18,7 +18,7 @@ class ReglementController extends Controller
             $reglements = Reglement::with("vente")->latest()->get();
 
             return response()->json([
-                "data" => ReglementResource::collection($reglements),
+                "data" => ReglementVenteResource::collection($reglements),
                 "message" => "Règlements récupérés avec succès!",
             ]);
         } catch (Exception $e) {
@@ -27,7 +27,7 @@ class ReglementController extends Controller
         }
     }
 
-    public function store(ReglementRequest $request)
+    public function store(ReglementVenteRequest $request)
     {
         try {
             DB::beginTransaction();
@@ -38,7 +38,7 @@ class ReglementController extends Controller
             DB::commit();
 
             return response()->json([
-                "data" => new ReglementResource($reglement),
+                "data" => new ReglementVenteResource($reglement),
                 "message" => "Règlement ajouté avec succès",
             ], 201);
         } catch (Exception $e) {
@@ -52,10 +52,10 @@ class ReglementController extends Controller
     {
         $reglement->load("vente");
 
-        return response()->json(["data" => new ReglementResource($reglement)]);
+        return response()->json(["data" => new ReglementVenteResource($reglement)]);
     }
 
-    public function update(ReglementRequest $request, Reglement $vente_reglement)
+    public function update(ReglementVenteRequest $request, Reglement $vente_reglement)
     {
         Log::info("Données validées des reglement ", ["data" => $request->validated()]);
         try {

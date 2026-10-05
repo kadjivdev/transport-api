@@ -6,7 +6,7 @@ use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\JsonResource;
 use Illuminate\Support\Carbon;
 
-class ReglementResource extends JsonResource
+class ReglementLocationResource extends JsonResource
 {
     /**
      * Transform the resource into an array.
@@ -17,19 +17,20 @@ class ReglementResource extends JsonResource
     {
         return [
             "id" => $this->id,
-            "code" => $this->code,
-            "vente" => $this->whenLoaded("vente"),
+            "reference" => $this->reference,
+            "location" => $this->whenLoaded("location"),
+            "camions" => $this->whenLoaded("camions"),
             "montant" => $this->montant,
-            "observation" => $this->observation,
-            "document" => $this->document,
-            "createdBy" => $this->createdBy,
+            "commentaire" => $this->commentaire,
+            "preuve" => $this->preuve,
+            "createdBy" => $this->whenLoaded("createdBy"),
             "validatedAt" => $this->validated_at
                 ? Carbon::parse($this->validated_at)->locale("fr")->isoFormat("D MMMM YYYY")
                 : null,
             "createdAt" => $this->created_at
                 ? Carbon::parse($this->created_at)->locale("fr")->isoFormat("D MMMM YYYY")
                 : null,
-            "validatedBy" => $this->validatedBy,
+            "validatedBy" => $this->whenLoaded("validatedBy"),
         ];
     }
 }

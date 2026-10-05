@@ -4,7 +4,7 @@ namespace App\Http\Requests;
 
 use Illuminate\Foundation\Http\FormRequest;
 
-class ReglementRequest extends FormRequest
+class ReglementVenteRequest extends FormRequest
 {
     /**
      * Determine if the user is authorized to make this request.
@@ -21,9 +21,11 @@ class ReglementRequest extends FormRequest
      */
     public function rules(): array
     {
+        $required = $this->isMethod('PATCH') ? 'sometimes|required|' : 'required|';
+
         return [
-            "vente_id" => "required|integer|exists:ventes,id",
-            "montant" => "required|numeric|min:0.01",
+            "vente_id" => $required . "integer|exists:ventes,id",
+            "montant" => $required . "numeric|min:0.01",
             "observation" => "nullable|string",
             "document" => "nullable|file|mimes:pdf,png,jpg,jpeg,doc,docx|max:5120",
         ];
@@ -40,7 +42,8 @@ class ReglementRequest extends FormRequest
             'vente_id.exists' => "La vente sélectionnée est invalide.",
             'montant.required' => "Le montant est obligatoire.",
             'montant.numeric' => "Le montant doit être un nombre.",
-            'montant.min' => "Le montant doit être supérieur à 0.",
+            'montant.min' => "Le montant doit être supérieur ou égal à 0,01.",
+            'observation.string' => "L'observation doit être une chaîne de caractères.",
             'document.file' => "Le fichier doit être valide.",
             'document.mimes' => "Le fichier doit être de type : pdf, png, jpg, jpeg, doc ou docx.",
             'document.max' => "Le fichier ne doit pas dépasser 5 Mo.",
