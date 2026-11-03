@@ -3,8 +3,11 @@
 namespace App\Http\Controllers;
 
 use App\Http\Requests\LocationRequest;
+use App\Http\Resources\AchatResource;
 use App\Http\Resources\LocationResource;
+use App\Models\Achat;
 use App\Models\Client;
+use App\Models\Fournisseur;
 use App\Models\Location;
 use Carbon\Carbon;
 use Illuminate\Http\Request;

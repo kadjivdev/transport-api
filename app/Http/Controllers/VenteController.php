@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Http\Requests\VenteRequest;
 use App\Http\Resources\VenteResource;
+use App\Models\Achat;
 use App\Models\Vente;
 use Exception;
 use Illuminate\Support\Facades\Auth;
@@ -67,6 +68,19 @@ class VenteController extends Controller
             Log::info("Les dats entrant:", ["data" => $request->validated()]);
             DB::beginTransaction();
 
+            $achat = Achat::whereNotNull("validated_at")->find($request->achat_id);
+            if (!$achat) {
+                return response()->json([
+                    "error" => "Achat non trouvé ou non validé.",
+                ], 404);
+            }
+
+            if($achat->qte < $request->qte) {
+                return response()->json([
+                    "error" => "Quantité demandée supérieure à la quantité disponible.",
+                ], 400);
+            }
+
             $vente = Vente::create($request->validated());
             $vente->load(["achat", "client", "camion", "createdBy", "validatedBy"]);
 
@@ -122,7 +136,7 @@ class VenteController extends Controller
      */
     public function validateVente(Vente $vente)
     {
-        Log::info("Validation de la Vente $vente->code ");
+        Log::info("Validation de la Vente $vente->code");
         try {
             DB::beginTransaction();
 

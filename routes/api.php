@@ -65,6 +65,9 @@ Route::prefix("/v1")->group(function () {
         Route::match(["GET", "POST"], "/locations/statistiques-periode", [LocationController::class, "statistiquesPeriode"])->name("statistiquesPeriode");
         Route::match(["GET", "POST"], "/locations/statistiques-client", [LocationController::class, "statistiquesClient"])->name("statistiquesClient");
 
+        // 
+        Route::match(["GET", "POST"], "/achatVente/statistiques-achat", [AchatController::class, "statistiquesAchat"])->name("statistiquesAchat");
+
         Route::apiResource("reglements", ReglementLocationController::class)->except(["create", "edit"]);
         Route::apiResource("depenses", DepenseLocationController::class)->except(["create", "edit"]);
         Route::apiResource("location-types", LocationTypeController::class)->except(["create", "edit"]);

@@ -5,7 +5,9 @@ namespace App\Http\Controllers;
 use App\Http\Requests\AchatRequest;
 use App\Http\Resources\AchatResource;
 use App\Models\Achat;
+use App\Models\Fournisseur;
 use Exception;
+use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
@@ -41,15 +43,18 @@ class AchatController extends Controller
      */
     public function achatValidated()
     {
+        Log::info("Récupération des achats validés");
+
         try {
             $achats = Achat::query()
-                ->whereNotNull("validated_by") //seuls les achats validés
+                ->whereNotNull("validated_at") //seuls les achats validés
                 ->latest()
-                ->select(["id", "code"])
                 ->get();
 
+            Log::debug("Récupération des achats validés", ["data" => $achats]);
+
             return response()->json([
-                "data" => $achats,
+                "data" => AchatResource::collection($achats),
                 "message" => "Achats validés récupérés avec succès!",
             ]);
         } catch (Exception $e) {
@@ -63,6 +68,7 @@ class AchatController extends Controller
      */
     public function store(AchatRequest $request)
     {
+        Log::debug("Données reçues pour l'insertion de l'achat", ["data" => $request->all()]);
         try {
             DB::beginTransaction();
 
@@ -133,7 +139,7 @@ class AchatController extends Controller
 
             $achat->update([
                 "validated_at" => now(),
-                "validated_by" => Auth::id()
+                "validated_by" => Auth::user()?->id,
             ]);
 
             DB::commit();
@@ -164,6 +170,61 @@ class AchatController extends Controller
             DB::rollBack();
             Log::debug("Erreur lors de la suppression de l'achat", ["error" => $e->getMessage()]);
             return response()->json(["error" => $e->getMessage()], 500);
+        }
+    }
+
+    /**
+     * Statistique par achat.
+     */
+    public function statistiquesAchat(Request $request)
+    {
+        try {
+
+            if (!$request->fournisseur_id) {
+                return response()
+                    ->json([]);
+            }
+
+            Log::debug("Les datas : ", ["datas" => $request->all()]);
+            $data = Achat::with([
+                "product",
+                "fournisseur",
+                "camion",
+                "createdBy",
+                "validatedBy",
+                "ventes" => fn ($query) => $query->whereNotNull("validated_at"),
+            ])->latest()
+                ->whereNotNull("validated_at")
+                ->where("fournisseur_id", $request->fournisseur_id)
+                ->get();
+
+            $achats = AchatResource::collection($data);
+
+            Log::debug("Achats filtrés :", ["data" => $achats]);
+
+            $totalMontant = $data->sum(fn (Achat $achat) => $achat->montant);
+            $totalVendue = $data->sum(
+                fn (Achat $achat) => $achat->ventes->sum(fn ($vente) => $vente->amount)
+            );
+            $totaux = [
+                "total_montant" => number_format($totalMontant, 2, ",", " "),
+                "total_vendue" => number_format($totalVendue, 2, ",", " "),
+                "total_reste" => number_format($totalMontant - $totalVendue, 2, ",", " "),
+            ];
+
+            Log::debug("Achats totaux :", ["data" => $totaux]);
+
+            return response()->json([
+                "achats" => $achats,
+                "totaux" => $totaux,
+                "fournisseur" => Fournisseur::find($request->fournisseur_id),
+            ], 200);
+        } catch (\Illuminate\Validation\ValidationException $e) {
+            Log::debug("Erreur de validation lors de la statistique", [
+                "data" => $e->errors()
+            ]);
+
+            return response()->json($e->errors(), 422);
         }
     }
 }

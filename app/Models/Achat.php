@@ -4,17 +4,22 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\SoftDeletes;
 
 class Achat extends Model
 {
     use softDeletes;
+
+    protected $appends = ['montant'];
+
     protected $fillable = [
         "code",
         "product_id",
         "fournisseur_id",
         "camion_id",
         "qte",
+        "unite_price",
         "paiement_preuve",
         "bordereau",
         "validated_at",
@@ -22,6 +27,11 @@ class Achat extends Model
         "validated_by",
         "created_by"
     ];
+
+    function getMontantAttribute()
+    {
+        return $this->qte * $this->unite_price;
+    }
 
     /**Product */
     function product(): BelongsTo
@@ -39,6 +49,12 @@ class Achat extends Model
     function fournisseur(): BelongsTo
     {
         return $this->belongsTo(Fournisseur::class);
+    }
+
+    /** vente */
+    function ventes(): HasMany
+    {
+        return $this->hasMany(Vente::class,"achat_id");
     }
 
     /**created by */
@@ -108,6 +124,5 @@ class Achat extends Model
             $model->paiement_preuve = $model->handlePreuveUploading();
             $model->bordereau = $model->handleBordereauUploading();
         });
-
     }
 }
