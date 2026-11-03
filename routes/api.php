@@ -35,7 +35,7 @@ Route::prefix("/v1")->group(function () {
         ->name('logout');
 
     // Protected routes
-    // Route::middleware(['jwt.from.cookie'])->group(function () {
+    Route::middleware(['jwt.from.cookie'])->group(function () {
         Route::get("/dashboard", DashboardController::class)->name("dahsboard");
         Route::get("/permissions", [RoleController::class, "getPermissions"])->name("permissions");
         Route::post("/affect-role", [RoleController::class, "affectRole"])->name("affect-role");
@@ -95,5 +95,5 @@ Route::prefix("/v1")->group(function () {
 
         Route::apiResource("vente-reglements", ReglementVenteController::class)->except(["create", "edit"]);
         Route::post("/vente-reglements/{reglement}/validate", [ReglementVenteController::class, "validateReglement"]);
-    // });
+    });
 });

@@ -11,7 +11,6 @@ use Illuminate\Http\Request;
 use Illuminate\Http\Response;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Cookie;
-// use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Str;
 use Illuminate\Validation\ValidationException;
@@ -74,7 +73,7 @@ class AuthenticatedSessionController extends Controller
             // Créer refresh token : on génère un token en clair, on stocke son hash
             $plainRefreshToken = Str::random(64);
 
-            $refreshToken = RefreshToken::create([
+            RefreshToken::create([
                 'user_id' => $user->id,
                 'token' => hash('sha256', $plainRefreshToken),
                 'expires_at' => now()->addMinutes((int) config('jwt.refresh_ttl')),
@@ -95,7 +94,7 @@ class AuthenticatedSessionController extends Controller
                 '/',
                 null,
                 $isProduction,   // secure : true en prod (HTTPS)
-                true,             // httpOnly
+                false,             // httpOnly
                 false,
                 'Lax',
             );
@@ -108,7 +107,7 @@ class AuthenticatedSessionController extends Controller
                 '/',
                 null,
                 $isProduction,   // secure
-                true,            // httpOnly
+                false,            // httpOnly
                 false,
                 'Lax',
             );
@@ -211,7 +210,7 @@ class AuthenticatedSessionController extends Controller
                 '/',
                 null,
                 $isProduction,
-                true,    // httpOnly
+                false,    // httpOnly
                 false,
                 'Lax',
             );
@@ -223,7 +222,7 @@ class AuthenticatedSessionController extends Controller
                 '/',
                 null,
                 $isProduction,
-                true,   // httpOnly
+                false,   // httpOnly
                 false,
                 'Lax',
             );
